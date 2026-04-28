@@ -17,18 +17,16 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   final BeneficiaryRepo _repo;
   final AuthRepo _authRepo;
 
-  BeneficiaryCubit({
-    required BeneficiaryRepo repo,
-    required AuthRepo authRepo,
-  }) : _repo = repo,
-       _authRepo = authRepo,
-       super(
-         BeneficiaryState(
-           registrationDraft: RegistrationDraft(
-             phone: authRepo.currentUserPhone ?? '',
-           ),
-         ),
-       );
+  BeneficiaryCubit({required BeneficiaryRepo repo, required AuthRepo authRepo})
+    : _repo = repo,
+      _authRepo = authRepo,
+      super(
+        BeneficiaryState(
+          registrationDraft: RegistrationDraft(
+            phone: authRepo.currentUserPhone ?? '',
+          ),
+        ),
+      );
 
   String get currentUserId => _authRepo.currentUserId ?? '';
 
@@ -138,7 +136,9 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     emit(state.copyWith(isLoading: true, clearError: true, clearSuccess: true));
     final result = await _repo.getOwnedCasesPage(limit: 10);
     result.fold(_emitFailure, (cases) {
-      final nextCases = startAfter == null ? cases : [...state.ownedCases, ...cases];
+      final nextCases = startAfter == null
+          ? cases
+          : [...state.ownedCases, ...cases];
       emit(
         state.copyWith(
           isLoading: false,
@@ -158,7 +158,9 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   }
 
   Future<void> persistCaseDraft() async {
-    emit(state.copyWith(isSavingCase: true, clearError: true, clearSuccess: true));
+    emit(
+      state.copyWith(isSavingCase: true, clearError: true, clearSuccess: true),
+    );
     final result = await _repo.saveDraftCase(
       draft: state.caseDraft.toEntity(beneficiaryId: currentUserId),
     );
@@ -182,7 +184,9 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     if (caseId.isEmpty) {
       return;
     }
-    emit(state.copyWith(isSavingCase: true, clearError: true, clearSuccess: true));
+    emit(
+      state.copyWith(isSavingCase: true, clearError: true, clearSuccess: true),
+    );
     final result = await _repo.submitCaseForReview(caseId: caseId);
     result.fold(_emitFailure, (saved) {
       emit(
@@ -211,14 +215,22 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     String? documentType,
   }) async {
     if (!_isAllowedMimeType(mimeType)) {
-      emit(state.copyWith(errorMessage: 'Only JPG, PNG, or PDF files are allowed.'));
+      emit(
+        state.copyWith(
+          errorMessage: 'Only JPG, PNG, or PDF files are allowed.',
+        ),
+      );
       return;
     }
     if (bytes.length > AppEnv.uploadMaxBytes) {
-      emit(state.copyWith(errorMessage: 'Selected file exceeds the upload limit.'));
+      emit(
+        state.copyWith(errorMessage: 'Selected file exceeds the upload limit.'),
+      );
       return;
     }
-    emit(state.copyWith(isUploading: true, uploadProgress: 0, clearError: true));
+    emit(
+      state.copyWith(isUploading: true, uploadProgress: 0, clearError: true),
+    );
     final effectiveType = documentType ?? scope;
     final initResult = await _repo.initUpload(
       request: UploadRequest(
@@ -228,7 +240,9 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
         scope: scope,
       ),
     );
-    await initResult.fold((failure) async => _emitFailure(failure), (session) async {
+    await initResult.fold((failure) async => _emitFailure(failure), (
+      session,
+    ) async {
       emit(
         state.copyWith(
           activeUploadId: session.uploadId,
@@ -246,7 +260,10 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
         },
       );
       result.fold(_emitFailure, (document) {
-        final nextByType = {...state.uploadedDocumentsByType, document.type: document};
+        final nextByType = {
+          ...state.uploadedDocumentsByType,
+          document.type: document,
+        };
         final nextDocuments = nextByType.values.toList();
         emit(
           state.copyWith(
@@ -272,7 +289,11 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     final uploadId = state.activeUploadId;
     final uploadType = state.activeUploadType;
     if (uploadId == null || uploadType == null) {
-      emit(state.copyWith(errorMessage: 'No upload session is available to retry.'));
+      emit(
+        state.copyWith(
+          errorMessage: 'No upload session is available to retry.',
+        ),
+      );
       return;
     }
     emit(state.copyWith(isUploading: true, clearError: true));
@@ -285,7 +306,10 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
       onProgress: (progress) => emit(state.copyWith(uploadProgress: progress)),
     );
     result.fold(_emitFailure, (document) {
-      final nextByType = {...state.uploadedDocumentsByType, document.type: document};
+      final nextByType = {
+        ...state.uploadedDocumentsByType,
+        document.type: document,
+      };
       emit(
         state.copyWith(
           isUploading: false,
@@ -394,7 +418,8 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   int _activeCasesCount(List<CaseEntity> cases) {
     return cases
         .where(
-          (item) => item.status == CaseLifecycle.draft ||
+          (item) =>
+              item.status == CaseLifecycle.draft ||
               item.status == CaseLifecycle.pendingReview ||
               item.status == CaseLifecycle.collecting,
         )

@@ -191,6 +191,7 @@ class _RegistrationStep extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
+              key: ValueKey('city_dropdown_${draft.governorate}'),
               initialValue: draft.city.isEmpty ? null : draft.city,
               decoration: const InputDecoration(labelText: 'City'),
               items:

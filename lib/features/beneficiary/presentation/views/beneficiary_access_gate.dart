@@ -59,14 +59,18 @@ class BeneficiaryAccessGate extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-            final profile = profileSnapshot.data!.fold((_) => null, (value) => value);
+            final profile = profileSnapshot.data!.fold(
+              (_) => null,
+              (value) => value,
+            );
             if (profile?.status != BeneficiaryStatus.approved) {
               return _AccessMessage(
                 title: 'Approval required',
                 message:
                     'Your account must be approved before you can access this route.',
                 cta: 'Go to dashboard',
-                onPressed: () => context.go(AppRouter.beneficiaryDashboardRoute),
+                onPressed: () =>
+                    context.go(AppRouter.beneficiaryDashboardRoute),
               );
             }
             return child;

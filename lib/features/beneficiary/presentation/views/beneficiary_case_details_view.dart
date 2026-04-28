@@ -28,7 +28,9 @@ class _BeneficiaryCaseDetailsBody extends StatelessWidget {
       builder: (context, state) {
         final item = state.selectedCase;
         if (item == null) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         final progress = item.targetAmount == 0
             ? 0.0
@@ -38,7 +40,12 @@ class _BeneficiaryCaseDetailsBody extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              Row(children: [Expanded(child: Text(item.title)), StatusBadge(label: item.status)]),
+              Row(
+                children: [
+                  Expanded(child: Text(item.title)),
+                  StatusBadge(label: item.status),
+                ],
+              ),
               const SizedBox(height: 12),
               Text(item.description),
               const SizedBox(height: 24),

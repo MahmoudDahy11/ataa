@@ -8,11 +8,7 @@ class CaseCard extends StatelessWidget {
   final CaseEntity item;
   final VoidCallback onTap;
 
-  const CaseCard({
-    super.key,
-    required this.item,
-    required this.onTap,
-  });
+  const CaseCard({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +27,18 @@ class CaseCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text(item.title, style: AppTextStyles.titleLarge)),
+                  Expanded(
+                    child: Text(item.title, style: AppTextStyles.titleLarge),
+                  ),
                   StatusBadge(label: item.status),
                 ],
               ),
               const SizedBox(height: 8),
-              Text(item.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text(
+                item.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
               const SizedBox(height: 12),
               LinearProgressIndicator(
                 value: progress,

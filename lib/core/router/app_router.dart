@@ -68,27 +68,21 @@ class AppRouter {
         path: beneficiaryRegisterRoute,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const BeneficiaryAccessGate(
-            child: BeneficiaryRegisterView(),
-          ),
+          child: const BeneficiaryAccessGate(child: BeneficiaryRegisterView()),
         ),
       ),
       GoRoute(
         path: beneficiaryDashboardRoute,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const BeneficiaryAccessGate(
-            child: BeneficiaryDashboardView(),
-          ),
+          child: const BeneficiaryAccessGate(child: BeneficiaryDashboardView()),
         ),
       ),
       GoRoute(
         path: beneficiaryProfileRoute,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const BeneficiaryAccessGate(
-            child: BeneficiaryProfileView(),
-          ),
+          child: const BeneficiaryAccessGate(child: BeneficiaryProfileView()),
         ),
       ),
       GoRoute(
@@ -116,9 +110,7 @@ class AppRouter {
         path: beneficiaryDocumentsRoute,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const BeneficiaryAccessGate(
-            child: BeneficiaryDocumentsView(),
-          ),
+          child: const BeneficiaryAccessGate(child: BeneficiaryDocumentsView()),
         ),
       ),
     ],

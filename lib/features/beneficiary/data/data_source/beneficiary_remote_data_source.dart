@@ -11,7 +11,9 @@ abstract class BeneficiaryRemoteDataSource {
 
   Future<BeneficiaryModel> getProfile();
 
-  Future<BeneficiaryModel> updateProfile({required BeneficiaryModel beneficiary});
+  Future<BeneficiaryModel> updateProfile({
+    required BeneficiaryModel beneficiary,
+  });
 
   Stream<List<CaseModel>> watchOwnedCases({int limit = 10});
 

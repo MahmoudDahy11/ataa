@@ -18,7 +18,9 @@ class BeneficiaryDashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<BeneficiaryCubit>()..loadProfile()..loadDashboard(),
+      create: (_) => sl<BeneficiaryCubit>()
+        ..loadProfile()
+        ..loadDashboard(),
       child: const _BeneficiaryDashboardBody(),
     );
   }
@@ -71,11 +73,15 @@ class _BeneficiaryDashboardBody extends StatelessWidget {
                 if (profile != null) ...[
                   StatusBadge(label: profile.status),
                   const SizedBox(height: 12),
-                  Text(profile.fullName, style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    profile.fullName,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   const SizedBox(height: 8),
                   if (profile.status != BeneficiaryStatus.approved) ...[
                     const RestrictionBanner(
-                      message: 'Account under review. Case creation stays disabled until approval.',
+                      message:
+                          'Account under review. Case creation stays disabled until approval.',
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -96,13 +102,16 @@ class _BeneficiaryDashboardBody extends StatelessWidget {
                   );
                 }),
                 if (state.ownedCases.isEmpty && !state.isLoading)
-                  const Text('No cases yet. Start by creating your first draft.'),
+                  const Text(
+                    'No cases yet. Start by creating your first draft.',
+                  ),
                 if (state.hasMoreCases)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: CustomGradientButton(
                       text: 'Load more',
-                      onPressed: () => cubit.loadDashboard(startAfter: state.lastCaseCursor),
+                      onPressed: () =>
+                          cubit.loadDashboard(startAfter: state.lastCaseCursor),
                     ),
                   ),
               ],

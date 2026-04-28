@@ -126,9 +126,9 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
   Stream<Either<CustomFailure, List<CaseEntity>>> watchOwnedCases({
     int limit = 10,
   }) {
-    return _dataSource.watchOwnedCases(limit: limit).map(
-      (cases) => Right<CustomFailure, List<CaseEntity>>(cases),
-    );
+    return _dataSource
+        .watchOwnedCases(limit: limit)
+        .map((cases) => Right<CustomFailure, List<CaseEntity>>(cases));
   }
 
   @override
@@ -138,7 +138,10 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
   }) async {
     try {
       return Right(
-        await _dataSource.getOwnedCasesPage(startAfter: startAfter, limit: limit),
+        await _dataSource.getOwnedCasesPage(
+          startAfter: startAfter,
+          limit: limit,
+        ),
       );
     } on FirebaseException catch (error) {
       return Left(AuthFailure.fromGenericError(error.message ?? error.code));
@@ -165,7 +168,9 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
     try {
       final profile = await _dataSource.getProfile();
       if (profile.status != BeneficiaryStatus.approved) {
-        return Left(AuthFailure.fromGenericError('Approval is required first.'));
+        return Left(
+          AuthFailure.fromGenericError('Approval is required first.'),
+        );
       }
       final model = await _dataSource.saveDraftCase(
         draft: CaseModel(
@@ -199,7 +204,9 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
     try {
       final profile = await _dataSource.getProfile();
       if (profile.status != BeneficiaryStatus.approved) {
-        return Left(AuthFailure.fromGenericError('Approval is required first.'));
+        return Left(
+          AuthFailure.fromGenericError('Approval is required first.'),
+        );
       }
       return Right(await _dataSource.submitCaseForReview(caseId: caseId));
     } on FirebaseException catch (error) {

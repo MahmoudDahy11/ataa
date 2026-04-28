@@ -87,7 +87,9 @@ class BeneficiaryState {
       isUploading: isUploading ?? this.isUploading,
       currentStep: currentStep ?? this.currentStep,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
-      successMessage: clearSuccess ? null : successMessage ?? this.successMessage,
+      successMessage: clearSuccess
+          ? null
+          : successMessage ?? this.successMessage,
       registrationDraft: registrationDraft ?? this.registrationDraft,
       caseDraft: caseDraft ?? this.caseDraft,
       profile: profile ?? this.profile,

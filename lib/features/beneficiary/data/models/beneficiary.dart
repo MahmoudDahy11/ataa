@@ -35,7 +35,10 @@ class BeneficiaryModel extends BeneficiaryEntity {
     required super.updatedAt,
   });
 
-  factory BeneficiaryModel.fromJson(Map<String, dynamic> json, {String id = ''}) {
+  factory BeneficiaryModel.fromJson(
+    Map<String, dynamic> json, {
+    String id = '',
+  }) {
     return BeneficiaryModel(
       id: id.isEmpty ? (json['id'] as String? ?? '') : id,
       fullName: json['fullName'] as String? ?? '',
@@ -63,8 +66,8 @@ class BeneficiaryModel extends BeneficiaryEntity {
           .toList(),
       status: json['status'] as String? ?? BeneficiaryStatus.pendingReview,
       isDeleted: json['isDeleted'] as bool? ?? false,
-      schemaVersion:
-          (json['schemaVersion'] as num? ?? AppStrings.schemaVersion).toInt(),
+      schemaVersion: (json['schemaVersion'] as num? ?? AppStrings.schemaVersion)
+          .toInt(),
       documents: (json['documents'] as List<dynamic>? ?? [])
           .whereType<Map<String, dynamic>>()
           .map(DocumentModel.fromJson)

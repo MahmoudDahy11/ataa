@@ -15,17 +15,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('BeneficiaryCubit', () {
-    test('loadProfile enables case creation for approved beneficiaries', () async {
-      final cubit = BeneficiaryCubit(
-        repo: _FakeBeneficiaryRepo(status: BeneficiaryStatus.approved),
-        authRepo: _FakeAuthRepo(),
-      );
+    test(
+      'loadProfile enables case creation for approved beneficiaries',
+      () async {
+        final cubit = BeneficiaryCubit(
+          repo: _FakeBeneficiaryRepo(status: BeneficiaryStatus.approved),
+          authRepo: _FakeAuthRepo(),
+        );
 
-      await cubit.loadProfile();
+        await cubit.loadProfile();
 
-      expect(cubit.state.profile?.status, BeneficiaryStatus.approved);
-      expect(cubit.canCreateCase(), isTrue);
-    });
+        expect(cubit.state.profile?.status, BeneficiaryStatus.approved);
+        expect(cubit.canCreateCase(), isTrue);
+      },
+    );
 
     test('startUpload rejects invalid mime type before backend call', () async {
       final cubit = BeneficiaryCubit(
@@ -44,25 +47,28 @@ void main() {
       expect(cubit.state.errorMessage, contains('JPG, PNG, or PDF'));
     });
 
-    test('continueRegistration validates national ID before advancing', () async {
-      final cubit = BeneficiaryCubit(
-        repo: _FakeBeneficiaryRepo(status: BeneficiaryStatus.pendingReview),
-        authRepo: _FakeAuthRepo(),
-      );
+    test(
+      'continueRegistration validates national ID before advancing',
+      () async {
+        final cubit = BeneficiaryCubit(
+          repo: _FakeBeneficiaryRepo(status: BeneficiaryStatus.pendingReview),
+          authRepo: _FakeAuthRepo(),
+        );
 
-      cubit.saveRegistrationStep(
-        cubit.state.registrationDraft.copyWith(
-          fullName: 'User Name',
-          nationalId: '123',
-          dateOfBirth: DateTime(1995, 1, 1),
-        ),
-      );
+        cubit.saveRegistrationStep(
+          cubit.state.registrationDraft.copyWith(
+            fullName: 'User Name',
+            nationalId: '123',
+            dateOfBirth: DateTime(1995, 1, 1),
+          ),
+        );
 
-      await cubit.continueRegistration();
+        await cubit.continueRegistration();
 
-      expect(cubit.state.currentStep, 0);
-      expect(cubit.state.errorMessage, contains('14 digits'));
-    });
+        expect(cubit.state.currentStep, 0);
+        expect(cubit.state.errorMessage, contains('14 digits'));
+      },
+    );
 
     test('submit step requires all predefined documents', () async {
       final cubit = BeneficiaryCubit(
@@ -225,7 +231,9 @@ class _FakeAuthRepo implements AuthRepo {
   String? get currentUserPhone => '+201000000000';
 
   @override
-  Future<Either<AuthFailure, String?>> getUserRole({required String uid}) async {
+  Future<Either<AuthFailure, String?>> getUserRole({
+    required String uid,
+  }) async {
     return const Right('Beneficiary');
   }
 
@@ -240,7 +248,9 @@ class _FakeAuthRepo implements AuthRepo {
   Future<void> signOut() async {}
 
   @override
-  Future<Either<AuthFailure, String>> verifyPhone({required String phone}) async {
+  Future<Either<AuthFailure, String>> verifyPhone({
+    required String phone,
+  }) async {
     throw UnimplementedError();
   }
 

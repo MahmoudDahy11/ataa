@@ -59,9 +59,7 @@ void setupServiceLocator() {
   // Cubits
   sl.registerLazySingleton(() => AuthCubit(authRepo: sl<AuthRepo>()));
   sl.registerFactory(
-    () => BeneficiaryCubit(
-      repo: sl<BeneficiaryRepo>(),
-      authRepo: sl<AuthRepo>(),
-    ),
+    () =>
+        BeneficiaryCubit(repo: sl<BeneficiaryRepo>(), authRepo: sl<AuthRepo>()),
   );
 }

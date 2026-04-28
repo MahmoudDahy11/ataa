@@ -55,7 +55,11 @@ class DocumentUploadWidget extends StatelessWidget {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(withData: true, type: FileType.custom, allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf']);
+    final result = await FilePicker.platform.pickFiles(
+      withData: true,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
     final file = result?.files.single;
     if (file == null || file.bytes == null) {
       return;
@@ -63,11 +67,7 @@ class DocumentUploadWidget extends StatelessWidget {
     final mimeType = _mimeTypeFromExtension(file.extension ?? '');
     final bytes = await _compressIfNeeded(file.path, mimeType, file.bytes!);
     onFileSelected(
-      SelectedUploadFile(
-        fileName: file.name,
-        mimeType: mimeType,
-        bytes: bytes,
-      ),
+      SelectedUploadFile(fileName: file.name, mimeType: mimeType, bytes: bytes),
     );
   }
 

@@ -33,8 +33,8 @@ class DocumentModel extends DocumentEntity {
       status: json['status'] as String? ?? 'pending',
       uploadId: json['uploadId'] as String?,
       isDeleted: json['isDeleted'] as bool? ?? false,
-      schemaVersion:
-          (json['schemaVersion'] as num? ?? AppStrings.schemaVersion).toInt(),
+      schemaVersion: (json['schemaVersion'] as num? ?? AppStrings.schemaVersion)
+          .toInt(),
       createdAt: parseTimestamp(json['createdAt']),
       updatedAt: parseTimestamp(json['updatedAt']),
     );

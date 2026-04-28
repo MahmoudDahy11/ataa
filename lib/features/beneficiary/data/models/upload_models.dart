@@ -10,8 +10,9 @@ class UploadSessionModel extends UploadSession {
   });
 
   factory UploadSessionModel.fromJson(Map<String, dynamic> json) {
-    final headers = (json['headers'] as Map<String, dynamic>? ?? {})
-        .map((key, value) => MapEntry(key, value.toString()));
+    final headers = (json['headers'] as Map<String, dynamic>? ?? {}).map(
+      (key, value) => MapEntry(key, value.toString()),
+    );
     return UploadSessionModel(
       uploadId: json['uploadId'] as String? ?? '',
       signedUrl: json['signedUrl'] as String? ?? '',

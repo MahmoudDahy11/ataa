@@ -30,10 +30,13 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
 
   String get _uid => _auth.currentUser?.uid ?? '';
 
-  Future<String> get _token async => await _auth.currentUser?.getIdToken() ?? '';
+  Future<String> get _token async =>
+      await _auth.currentUser?.getIdToken() ?? '';
 
   @override
-  Future<BeneficiaryModel> register({required BeneficiaryModel beneficiary}) async {
+  Future<BeneficiaryModel> register({
+    required BeneficiaryModel beneficiary,
+  }) async {
     final uid = _uid;
     final now = FieldValue.serverTimestamp();
     await _firestore.collection(AppStrings.usersCollection).doc(uid).set({
@@ -45,10 +48,10 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     }, SetOptions(merge: true));
     final data = beneficiary.toJson()
       ..addAll({'updatedAt': now, 'createdAt': beneficiary.createdAt ?? now});
-    await _firestore.collection(AppStrings.beneficiariesCollection).doc(uid).set(
-      data,
-      SetOptions(merge: true),
-    );
+    await _firestore
+        .collection(AppStrings.beneficiariesCollection)
+        .doc(uid)
+        .set(data, SetOptions(merge: true));
     final snapshot = await _firestore
         .collection(AppStrings.beneficiariesCollection)
         .doc(uid)
@@ -131,7 +134,9 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
         'createdAt': draft.createdAt ?? FieldValue.serverTimestamp(),
       });
     final collection = _firestore.collection(AppStrings.casesCollection);
-    final docRef = draft.id.isEmpty ? collection.doc() : collection.doc(draft.id);
+    final docRef = draft.id.isEmpty
+        ? collection.doc()
+        : collection.doc(draft.id);
     await docRef.set(data, SetOptions(merge: true));
     final snapshot = await docRef.get();
     return CaseModel.fromJson(snapshot.data() ?? {}, id: snapshot.id);
@@ -139,7 +144,9 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
 
   @override
   Future<CaseModel> submitCaseForReview({required String caseId}) async {
-    final docRef = _firestore.collection(AppStrings.casesCollection).doc(caseId);
+    final docRef = _firestore
+        .collection(AppStrings.casesCollection)
+        .doc(caseId);
     await docRef.update({
       'status': CaseLifecycle.pendingReview,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -163,7 +170,9 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
       token: await _token,
       headers: {'x-user-id': _uid},
     );
-    final session = UploadSessionModel.fromJson(response.data as Map<String, dynamic>);
+    final session = UploadSessionModel.fromJson(
+      response.data as Map<String, dynamic>,
+    );
     _uploadSessions[session.uploadId] = session;
     return session;
   }
@@ -210,11 +219,14 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     final data = response.data as Map<String, dynamic>;
     data['displayName'] ??= RequiredDocumentType.labels[type] ?? type;
     data['type'] ??= type;
-    final document = DocumentModel.fromJson(data, id: data['id'] as String? ?? '');
-    await _firestore.collection(AppStrings.documentsCollection).doc(document.id).set(
-      document.toJson(),
-      SetOptions(merge: true),
+    final document = DocumentModel.fromJson(
+      data,
+      id: data['id'] as String? ?? '',
     );
+    await _firestore
+        .collection(AppStrings.documentsCollection)
+        .doc(document.id)
+        .set(document.toJson(), SetOptions(merge: true));
     return document;
   }
 

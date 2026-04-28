@@ -49,12 +49,15 @@ class _BeneficiaryDocumentsBody extends StatelessWidget {
                     children: [
                       DocumentUploadWidget(
                         label: documentLabel(type),
-                        helperText: item == null ? 'Required upload' : item.fileName,
+                        helperText: item == null
+                            ? 'Required upload'
+                            : item.fileName,
                         isUploaded: item != null,
                         isUploading:
                             state.isUploading && state.activeUploadType == type,
-                        progress:
-                            state.activeUploadType == type ? state.uploadProgress : 0,
+                        progress: state.activeUploadType == type
+                            ? state.uploadProgress
+                            : 0,
                         onFileSelected: (file) {
                           cubit.startUpload(
                             fileName: file.fileName,

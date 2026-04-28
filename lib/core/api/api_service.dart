@@ -35,6 +35,7 @@ class ApiService {
     );
     return response;
   }
+
   /*
   * This method is used to upload files as bytes to the server.
   * It takes the URL, the file bytes, content type, optional headers, and a callback for tracking upload progress.
@@ -52,10 +53,7 @@ class ApiService {
       url,
       data: bytes,
       onSendProgress: onSendProgress,
-      options: Options(
-        contentType: contentType,
-        headers: headers,
-      ),
+      options: Options(contentType: contentType, headers: headers),
     );
     return response;
   }

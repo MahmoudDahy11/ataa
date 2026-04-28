@@ -34,8 +34,8 @@ class CaseModel extends CaseEntity {
           .toList(),
       status: json['status'] as String? ?? CaseLifecycle.draft,
       isDeleted: json['isDeleted'] as bool? ?? false,
-      schemaVersion:
-          (json['schemaVersion'] as num? ?? AppStrings.schemaVersion).toInt(),
+      schemaVersion: (json['schemaVersion'] as num? ?? AppStrings.schemaVersion)
+          .toInt(),
       createdAt: parseTimestamp(json['createdAt']),
       updatedAt: parseTimestamp(json['updatedAt']),
     );

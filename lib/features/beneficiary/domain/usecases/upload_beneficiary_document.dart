@@ -20,7 +20,10 @@ class UploadBeneficiaryDocument {
   }) async {
     final sessionResult = await _repo.initUpload(request: request);
     if (sessionResult.isLeft()) {
-      return sessionResult.fold(Left.new, (_) => throw StateError('Unreachable'));
+      return sessionResult.fold(
+        Left.new,
+        (_) => throw StateError('Unreachable'),
+      );
     }
     final session = sessionResult.getOrElse(
       () => throw StateError('Upload session initialization failed'),

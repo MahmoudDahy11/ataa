@@ -15,7 +15,9 @@ class BeneficiaryProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<BeneficiaryCubit>()..loadProfile()..loadDashboard(),
+      create: (_) => sl<BeneficiaryCubit>()
+        ..loadProfile()
+        ..loadDashboard(),
       child: const _BeneficiaryProfileBody(),
     );
   }
@@ -35,7 +37,9 @@ class _BeneficiaryProfileBody extends StatelessWidget {
       builder: (context, state) {
         final profile = state.profile;
         if (profile == null) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         final age = calculateAge(profile.dateOfBirth);
         final payoutValue = profile.payoutMethod == PayoutMethodOption.bank
@@ -60,20 +64,27 @@ class _BeneficiaryProfileBody extends StatelessWidget {
               if (profile.status != BeneficiaryStatus.approved) ...[
                 const SizedBox(height: 16),
                 const RestrictionBanner(
-                  message: 'Account under review. Sensitive actions stay disabled until approval.',
+                  message:
+                      'Account under review. Sensitive actions stay disabled until approval.',
                 ),
               ],
               const SizedBox(height: 24),
               _Section(
                 title: 'Personal Info',
                 children: [
-                  _InfoTile(label: 'National ID', value: maskNationalId(profile.nationalId)),
+                  _InfoTile(
+                    label: 'National ID',
+                    value: maskNationalId(profile.nationalId),
+                  ),
                   _InfoTile(label: 'Phone', value: maskPhone(profile.phone)),
                   _InfoTile(
                     label: 'Date of birth',
                     value: profile.dateOfBirth == null
                         ? '-'
-                        : profile.dateOfBirth!.toIso8601String().split('T').first,
+                        : profile.dateOfBirth!
+                              .toIso8601String()
+                              .split('T')
+                              .first,
                   ),
                   _InfoTile(label: 'Age', value: age?.toString() ?? '-'),
                 ],
@@ -81,7 +92,10 @@ class _BeneficiaryProfileBody extends StatelessWidget {
               _Section(
                 title: 'Family & Income',
                 children: [
-                  _InfoTile(label: 'Family size', value: profile.familySize.toString()),
+                  _InfoTile(
+                    label: 'Family size',
+                    value: profile.familySize.toString(),
+                  ),
                   _InfoTile(
                     label: 'Income status',
                     value: formatEnumLabel(profile.incomeStatus),
@@ -131,8 +145,14 @@ class _BeneficiaryProfileBody extends StatelessWidget {
               _Section(
                 title: 'Cases Summary',
                 children: [
-                  _InfoTile(label: 'Total cases', value: state.totalCases.toString()),
-                  _InfoTile(label: 'Active cases', value: state.activeCases.toString()),
+                  _InfoTile(
+                    label: 'Total cases',
+                    value: state.totalCases.toString(),
+                  ),
+                  _InfoTile(
+                    label: 'Active cases',
+                    value: state.activeCases.toString(),
+                  ),
                   _InfoTile(
                     label: 'Completed cases',
                     value: state.completedCases.toString(),

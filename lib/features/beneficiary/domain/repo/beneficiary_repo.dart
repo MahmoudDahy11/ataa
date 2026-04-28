@@ -19,7 +19,9 @@ abstract class BeneficiaryRepo {
     required BeneficiaryEntity beneficiary,
   });
 
-  Stream<Either<CustomFailure, List<CaseEntity>>> watchOwnedCases({int limit = 10});
+  Stream<Either<CustomFailure, List<CaseEntity>>> watchOwnedCases({
+    int limit = 10,
+  });
 
   Future<Either<CustomFailure, List<CaseEntity>>> getOwnedCasesPage({
     DocumentSnapshot<Object?>? startAfter,

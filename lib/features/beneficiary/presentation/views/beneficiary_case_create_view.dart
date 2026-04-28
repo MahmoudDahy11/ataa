@@ -43,23 +43,29 @@ class _BeneficiaryCaseCreateBody extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             children: [
               if (!canCreate)
-                const Text('Case creation is locked until beneficiary approval is complete.'),
+                const Text(
+                  'Case creation is locked until beneficiary approval is complete.',
+                ),
               const SizedBox(height: 16),
               CustomTextField(
                 hintText: 'Title',
                 initialValue: draft.title,
-                onChanged: (value) => cubit.saveDraftCase(draft.copyWith(title: value)),
+                onChanged: (value) =>
+                    cubit.saveDraftCase(draft.copyWith(title: value)),
               ),
               const SizedBox(height: 16),
               CustomTextField(
                 hintText: 'Category',
                 initialValue: draft.category,
-                onChanged: (value) => cubit.saveDraftCase(draft.copyWith(category: value)),
+                onChanged: (value) =>
+                    cubit.saveDraftCase(draft.copyWith(category: value)),
               ),
               const SizedBox(height: 16),
               CustomTextField(
                 hintText: 'Target amount',
-                initialValue: draft.targetAmount == 0 ? '' : draft.targetAmount.toString(),
+                initialValue: draft.targetAmount == 0
+                    ? ''
+                    : draft.targetAmount.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => cubit.saveDraftCase(
                   draft.copyWith(targetAmount: double.tryParse(value) ?? 0),
@@ -70,7 +76,8 @@ class _BeneficiaryCaseCreateBody extends StatelessWidget {
                 hintText: 'Description',
                 initialValue: draft.description,
                 maxLines: 5,
-                onChanged: (value) => cubit.saveDraftCase(draft.copyWith(description: value)),
+                onChanged: (value) =>
+                    cubit.saveDraftCase(draft.copyWith(description: value)),
               ),
               const SizedBox(height: 16),
               DocumentUploadWidget(
