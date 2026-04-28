@@ -8,6 +8,14 @@ class AppStrings {
 
   // Firestore Collections
   static const usersCollection = 'users';
+  static const beneficiariesCollection = 'beneficiaries';
+  static const casesCollection = 'cases';
+  static const documentsCollection = 'documents';
+  static const donationsCollection = 'donations';
+  static const auditLogsCollection = 'audit_logs';
+
+  // Feature Schema
+  static const schemaVersion = 1;
 
   // Auth Messages
   static const phoneEmpty = 'Please enter phone number';
@@ -16,6 +24,8 @@ class AppStrings {
   static const otpVerified = 'OTP Verified Successfully';
   static const codeSent = 'Verification code sent';
   static const codeResent = 'Verification code resent';
+  static const beneficiaryRole = 'Beneficiary';
+  static const donorRole = 'Donor';
 
   // Store
 }

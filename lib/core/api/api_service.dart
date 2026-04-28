@@ -35,4 +35,28 @@ class ApiService {
     );
     return response;
   }
+  /*
+  * This method is used to upload files as bytes to the server.
+  * It takes the URL, the file bytes, content type, optional headers, and a callback for tracking upload progress.
+  * The content type should be set according to the file type being uploaded (e.g., 'image/jpeg' for JPEG images).
+  * The onSendProgress callback provides the number of bytes sent and the total bytes to be sent, allowing you to implement a progress indicator in the UI.
+  */
+  Future<Response> putBytes({
+    required String url,
+    required List<int> bytes,
+    required String contentType,
+    Map<String, dynamic>? headers,
+    void Function(int sent, int total)? onSendProgress,
+  }) async {
+    final response = await _dio.put(
+      url,
+      data: bytes,
+      onSendProgress: onSendProgress,
+      options: Options(
+        contentType: contentType,
+        headers: headers,
+      ),
+    );
+    return response;
+  }
 }
