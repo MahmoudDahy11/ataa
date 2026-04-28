@@ -1,3 +1,4 @@
+import 'package:ataa/core/helper/show_snak_bar.dart';
 import 'package:ataa/core/router/app_router.dart';
 import 'package:ataa/core/theme/app_colors.dart';
 import 'package:ataa/features/splash/presentation/cubit/splash_cubit.dart';
@@ -27,8 +28,13 @@ class SplashViewBody extends StatelessWidget {
       listener: (context, state) {
         if (state is SplashNavigateToOnboarding) {
           context.go(AppRouter.onboardingRoute);
+          showSnakBar(
+            context,
+            'Welcome to Ataa! Let\'s get started with onboarding.',
+          );
         } else if (state is SplashNavigateToAuth) {
           context.go(AppRouter.phoneInputRoute);
+          showSnakBar(context, 'Welcome back! Please sign in to continue.');
         }
       },
       child: const Scaffold(
