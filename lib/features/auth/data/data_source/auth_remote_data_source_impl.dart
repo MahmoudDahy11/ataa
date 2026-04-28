@@ -83,4 +83,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   String? get currentUserId => _auth.currentUser?.uid;
+
+  @override
+  String? get currentUserPhone => _auth.currentUser?.phoneNumber;
 }

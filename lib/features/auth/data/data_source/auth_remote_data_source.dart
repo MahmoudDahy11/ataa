@@ -26,4 +26,7 @@ abstract class AuthRemoteDataSource {
 
   /// Returns the current user's UID, or null.
   String? get currentUserId;
+
+  /// Returns the current user's verified phone number, or null.
+  String? get currentUserPhone;
 }
