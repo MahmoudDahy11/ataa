@@ -47,6 +47,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   bloc: ^9.2.0
   dartz: ^0.10.1
+  file_picker: ^10.3.2
+  flutter_image_compress: ^2.4.0
 
 dev_dependencies:
   flutter_test:
