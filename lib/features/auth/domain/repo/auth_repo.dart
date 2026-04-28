@@ -32,4 +32,7 @@ abstract class AuthRepo {
 
   /// Returns the current user's UID, or null if not signed in.
   String? get currentUserId;
+
+  /// Returns the verified phone number for the signed-in user, if available.
+  String? get currentUserPhone;
 }

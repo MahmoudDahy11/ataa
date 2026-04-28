@@ -85,4 +85,7 @@ class AuthRepoImpl implements AuthRepo {
 
   @override
   String? get currentUserId => _dataSource.currentUserId;
+
+  @override
+  String? get currentUserPhone => _dataSource.currentUserPhone;
 }
