@@ -147,7 +147,9 @@ class _OtpVerificationViewBodyState extends State<OtpVerificationViewBody> {
       context.go(AppRouter.roleSelectionRoute);
     } else if (state is AuthRoleSelected) {
       showSnakBar(context, 'Welcome back as ${state.role}!');
-      // TODO: Navigate to home/dashboard based on role
+      if (state.role == AppStrings.beneficiaryRole) {
+        context.go(AppRouter.beneficiaryDashboardRoute);
+      }
     }
   }
 

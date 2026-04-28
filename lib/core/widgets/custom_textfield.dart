@@ -8,9 +8,12 @@ class CustomTextField extends StatefulWidget {
   final IconData? prefixIcon;
   final bool isPassword;
   final TextEditingController? controller;
+  final String? initialValue;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
   final int maxLines;
   final TextInputType? keyboardType;
+  final bool readOnly;
 
   const CustomTextField({
     super.key,
@@ -18,9 +21,12 @@ class CustomTextField extends StatefulWidget {
     this.prefixIcon,
     this.isPassword = false,
     this.controller,
+    this.initialValue,
     this.validator,
+    this.onChanged,
     this.maxLines = 1,
     this.keyboardType,
+    this.readOnly = false,
   });
 
   @override
@@ -49,10 +55,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
       builder: (context, isObscured, _) {
         return TextFormField(
           controller: widget.controller,
+          initialValue: widget.controller == null ? widget.initialValue : null,
           obscureText: widget.isPassword ? isObscured : false,
           validator: widget.validator,
+          onChanged: widget.onChanged,
           maxLines: widget.maxLines,
           keyboardType: widget.keyboardType,
+          readOnly: widget.readOnly,
           style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: widget.hintText,

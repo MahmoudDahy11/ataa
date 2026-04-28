@@ -1,12 +1,14 @@
 import 'package:ataa/core/constants/app_strings.dart';
 import 'package:ataa/core/di/service_locator.dart';
 import 'package:ataa/core/helper/show_snak_bar.dart';
+import 'package:ataa/core/router/app_router.dart';
 import 'package:ataa/core/theme/app_colors.dart';
 import 'package:ataa/core/widgets/custom_gradient_button.dart';
 import 'package:ataa/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:ataa/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class RoleSelectionView extends StatelessWidget {
   const RoleSelectionView({super.key});
@@ -38,7 +40,9 @@ class _RoleSelectionViewBodyState extends State<RoleSelectionViewBody> {
           showSnakBar(context, state.message, isError: true);
         } else if (state is AuthRoleSelected) {
           showSnakBar(context, 'Welcome as ${state.role}!');
-          // Navigate to Home Feed or Dashboard based on role
+          if (state.role == AppStrings.beneficiaryRole) {
+            context.go(AppRouter.beneficiaryRegisterRoute);
+          }
         }
       },
       builder: (context, state) {
