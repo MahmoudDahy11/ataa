@@ -53,6 +53,8 @@ lib/core/env/app_env.dart# Created by https://www.toptal.com/developers/gitignor
 .dart_tool/
 .packages
 build/
+node_modules/
+functions/lib/
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 

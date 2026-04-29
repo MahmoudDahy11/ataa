@@ -4,11 +4,13 @@ import 'dart:developer';
 import 'package:ataa/features/auth/data/data_source/auth_remote_data_source.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 /// Firebase implementation of [AuthRemoteDataSource].
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+  final Map<String, ConfirmationResult> _webConfirmationResults = {};
 
   AuthRemoteDataSourceImpl({
     required FirebaseAuth auth,
@@ -18,6 +20,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<String> verifyPhone({required String phone}) async {
+    if (kIsWeb) {
+      return _verifyPhoneOnWeb(phone);
+    }
+
     final completer = Completer<String>();
 
     await _auth.verifyPhoneNumber(
@@ -47,11 +53,32 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String verificationId,
     required String smsCode,
   }) async {
+    if (kIsWeb) {
+      final confirmationResult = _webConfirmationResults.remove(verificationId);
+      if (confirmationResult == null) {
+        throw FirebaseAuthException(
+          code: 'missing-web-confirmation',
+          message:
+              'OTP session expired. Please request a new verification code.',
+        );
+      }
+      return await confirmationResult.confirm(smsCode);
+    }
+
     final credential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: smsCode,
     );
     return await _auth.signInWithCredential(credential);
+  }
+
+  Future<String> _verifyPhoneOnWeb(String phone) async {
+    final confirmationResult = await _auth.signInWithPhoneNumber(phone);
+    final verificationId =
+        'web-${DateTime.now().microsecondsSinceEpoch}-${phone.hashCode}';
+    _webConfirmationResults[verificationId] = confirmationResult;
+    log('OTP code sent on web', name: 'AuthDataSource');
+    return verificationId;
   }
 
   @override

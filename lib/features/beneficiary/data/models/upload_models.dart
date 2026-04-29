@@ -13,10 +13,14 @@ class UploadSessionModel extends UploadSession {
     final headers = (json['headers'] as Map<String, dynamic>? ?? {}).map(
       (key, value) => MapEntry(key, value.toString()),
     );
+    final signedUrl =
+        json['signedUrl'] as String? ?? json['uploadUrl'] as String? ?? '';
+    final storageKey =
+        json['storageKey'] as String? ?? json['filePath'] as String? ?? '';
     return UploadSessionModel(
       uploadId: json['uploadId'] as String? ?? '',
-      signedUrl: json['signedUrl'] as String? ?? '',
-      storageKey: json['storageKey'] as String? ?? '',
+      signedUrl: signedUrl,
+      storageKey: storageKey,
       expiresAt: DateTime.tryParse(json['expiresAt'] as String? ?? ''),
       headers: headers,
     );

@@ -173,6 +173,7 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     final session = UploadSessionModel.fromJson(
       response.data as Map<String, dynamic>,
     );
+    _validateStorjSignedUrl(session.signedUrl);
     _uploadSessions[session.uploadId] = session;
     return session;
   }
@@ -237,5 +238,15 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
       throw StateError('Upload session not found');
     }
     return session;
+  }
+
+  void _validateStorjSignedUrl(String signedUrl) {
+    final uri = Uri.tryParse(signedUrl);
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host != 'gateway.storjshare.io' ||
+        !uri.path.startsWith('/ataa/')) {
+      throw StateError('Upload signer returned an invalid Storj signed URL');
+    }
   }
 }
