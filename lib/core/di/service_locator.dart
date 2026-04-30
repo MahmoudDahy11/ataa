@@ -15,6 +15,19 @@ import 'package:ataa/features/beneficiary/domain/usecases/get_beneficiary_profil
 import 'package:ataa/features/beneficiary/domain/usecases/register_beneficiary.dart';
 import 'package:ataa/features/beneficiary/domain/usecases/save_beneficiary_case.dart';
 import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_cubit.dart';
+import 'package:ataa/features/donor/data/datasources/donor_local_datasource.dart';
+import 'package:ataa/features/donor/data/datasources/donor_remote_datasource.dart';
+import 'package:ataa/features/donor/data/datasources/donor_remote_datasource_impl.dart';
+import 'package:ataa/features/donor/data/models/donor_hive_model.dart';
+import 'package:ataa/features/donor/data/repositories/donor_repository_impl.dart';
+import 'package:ataa/features/donor/domain/repositories/donor_repository.dart';
+import 'package:ataa/features/donor/domain/usecases/get_donation_history.dart';
+import 'package:ataa/features/donor/domain/usecases/get_donor_profile.dart';
+import 'package:ataa/features/donor/domain/usecases/save_donor_profile.dart';
+import 'package:ataa/features/donor/domain/usecases/save_payment_method.dart';
+import 'package:ataa/features/donor/presentation/cubit/donor_profile_cubit.dart';
+import 'package:ataa/features/donor/presentation/cubit/donor_setup_cubit.dart';
+import 'package:ataa/features/donor/presentation/cubit/payment_method_cubit.dart';
 import 'package:ataa/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:ataa/features/upload/data/data_sources/upload_remote_data_source.dart';
 import 'package:ataa/features/upload/data/data_sources/upload_remote_data_source_impl.dart';
@@ -27,6 +40,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
 
 final sl = GetIt.instance;
 
@@ -94,4 +108,52 @@ void setupServiceLocator() {
     ),
   );
   sl.registerFactory(() => SplashCubit(sl<FirebaseAuth>(), sl<AuthRepo>()));
+
+  // ── Donor Feature ──────────────────────────────────────────────
+
+  // Donor - Local DataSource (Hive)
+  sl.registerLazySingleton<DonorLocalDataSource>(
+    () => DonorLocalDataSourceImpl(box: Hive.box('donor_box')),
+  );
+
+  // Donor - Remote DataSource
+  sl.registerLazySingleton<DonorRemoteDataSource>(
+    () => DonorRemoteDataSourceImpl(firestore: sl<FirebaseFirestore>()),
+  );
+
+  // Donor - Repository
+  sl.registerLazySingleton<DonorRepo>(
+    () => DonorRepoImpl(
+      remote: sl<DonorRemoteDataSource>(),
+      local: sl<DonorLocalDataSource>(),
+    ),
+  );
+
+  // Donor - Use Cases
+  sl.registerLazySingleton(() => SaveDonorProfile(sl<DonorRepo>()));
+  sl.registerLazySingleton(() => GetDonorProfile(sl<DonorRepo>()));
+  sl.registerLazySingleton(() => SavePaymentMethod(sl<DonorRepo>()));
+  sl.registerLazySingleton(() => GetDonationHistory(sl<DonorRepo>()));
+
+  // Donor - Cubits
+  sl.registerFactory(
+    () => DonorSetupCubit(
+      saveDonorProfile: sl<SaveDonorProfile>(),
+      auth: sl<FirebaseAuth>(),
+    ),
+  );
+  sl.registerFactory(
+    () => PaymentMethodCubit(
+      savePaymentMethod: sl<SavePaymentMethod>(),
+      repo: sl<DonorRepo>(),
+      auth: sl<FirebaseAuth>(),
+    ),
+  );
+  sl.registerFactory(
+    () => DonorProfileCubit(
+      getDonorProfile: sl<GetDonorProfile>(),
+      getDonationHistory: sl<GetDonationHistory>(),
+      auth: sl<FirebaseAuth>(),
+    ),
+  );
 }

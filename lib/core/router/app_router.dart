@@ -1,4 +1,12 @@
+import 'package:ataa/core/di/service_locator.dart';
+import 'package:ataa/features/donor/presentation/cubit/donor_profile_cubit.dart';
+import 'package:ataa/features/donor/presentation/cubit/donor_setup_cubit.dart';
+import 'package:ataa/features/donor/presentation/cubit/payment_method_cubit.dart';
+import 'package:ataa/features/donor/presentation/screens/donor_profile_screen.dart';
+import 'package:ataa/features/donor/presentation/screens/donor_setup_screen.dart';
+import 'package:ataa/features/donor/presentation/screens/payment_method_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/views/otp_verification_view.dart';
@@ -30,6 +38,11 @@ class AppRouter {
   static const String beneficiaryCaseCreateRoute = '/beneficiary/case/create';
   static const String beneficiaryDocumentsRoute = '/beneficiary/documents';
   static const String beneficiaryEditProfileRoute = '/beneficiary/profile/edit';
+
+  // Donor routes
+  static const String donorSetupRoute = '/donor/setup';
+  static const String donorPaymentMethodRoute = '/donor/payment-method';
+  static const String donorProfileRoute = '/donor/profile';
 
   static final router = GoRouter(
     initialLocation: splashRoute,
@@ -121,6 +134,41 @@ class AppRouter {
           state: state,
           child: const BeneficiaryAccessGate(
             child: BeneficiaryEditProfileView(),
+          ),
+        ),
+      ),
+
+      // ── Donor Routes ───────────────────────────────────────────
+      GoRoute(
+        path: donorSetupRoute,
+        name: 'donor_setup',
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: BlocProvider(
+            create: (_) => sl<DonorSetupCubit>(),
+            child: const DonorSetupScreen(),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: donorPaymentMethodRoute,
+        name: 'payment_method',
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: BlocProvider(
+            create: (_) => sl<PaymentMethodCubit>(),
+            child: const PaymentMethodScreen(),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: donorProfileRoute,
+        name: 'donor_profile',
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: BlocProvider(
+            create: (_) => sl<DonorProfileCubit>(),
+            child: const DonorProfileScreen(),
           ),
         ),
       ),
