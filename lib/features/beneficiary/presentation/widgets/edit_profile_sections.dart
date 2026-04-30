@@ -29,8 +29,10 @@ class PersonalInfoSection extends StatelessWidget {
             onChanged: (v) => onChanged(draft.copyWith(fullName: v)),
             prefixIcon: Icons.person_outline,
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'هذا الحقل مطلوب';
-              if (value.trim().split(' ').length < 3) return 'الرجاء إدخال الاسم ثلاثي على الأقل';
+              if (value == null || value.trim().isEmpty)
+                return 'هذا الحقل مطلوب';
+              if (value.trim().split(' ').length < 3)
+                return 'الرجاء إدخال الاسم ثلاثي على الأقل';
               return null;
             },
           ),
@@ -43,7 +45,8 @@ class PersonalInfoSection extends StatelessWidget {
             onChanged: (v) => onChanged(draft.copyWith(address: v)),
             prefixIcon: Icons.location_on_outlined,
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'هذا الحقل مطلوب';
+              if (value == null || value.trim().isEmpty)
+                return 'هذا الحقل مطلوب';
               if (value.trim().length < 10) return 'يرجى إدخال عنوان مفصل';
               return null;
             },
@@ -151,7 +154,9 @@ class FinancialInfoSection extends StatelessWidget {
           helper: 'يمكنك تغيير الرقم الذي ستصلك عليه الحوالات',
           child: CustomTextField(
             hintText: 'مثال: 01XXXXXXXXX',
-            initialValue: draft.payoutAccount.isNotEmpty ? draft.payoutAccount : draft.phone,
+            initialValue: draft.payoutAccount.isNotEmpty
+                ? draft.payoutAccount
+                : draft.phone,
             keyboardType: TextInputType.phone,
             onChanged: (v) => onChanged(
               draft.copyWith(payoutAccount: v, useSamePhoneForPayout: false),

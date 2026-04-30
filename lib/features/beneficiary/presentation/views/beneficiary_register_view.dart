@@ -43,7 +43,9 @@ class _BeneficiaryRegisterBody extends StatelessWidget {
         },
         builder: (context, state) {
           final cubit = context.read<BeneficiaryCubit>();
-          final canContinue = cubit.canContinueRegistration() && !state.isSubmittingRegistration;
+          final canContinue =
+              cubit.canContinueRegistration() &&
+              !state.isSubmittingRegistration;
 
           return Scaffold(
             backgroundColor: AppColors.background,
@@ -86,7 +88,8 @@ class _BeneficiaryRegisterBody extends StatelessWidget {
                     if (state.currentStep > 0)
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => cubit.goToStep(state.currentStep - 1),
+                          onPressed: () =>
+                              cubit.goToStep(state.currentStep - 1),
                           icon: const Icon(Icons.arrow_forward_rounded),
                           label: const Text('رجوع'),
                           style: OutlinedButton.styleFrom(
@@ -103,7 +106,9 @@ class _BeneficiaryRegisterBody extends StatelessWidget {
                       child: CustomGradientButton(
                         text: state.currentStep == 4 ? 'إرسال الطلب' : 'التالي',
                         isLoading: state.isSubmittingRegistration,
-                        onPressed: canContinue ? cubit.continueRegistration : null,
+                        onPressed: canContinue
+                            ? cubit.continueRegistration
+                            : null,
                       ),
                     ),
                   ],

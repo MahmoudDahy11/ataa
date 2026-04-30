@@ -50,10 +50,13 @@ class RegistrationStep extends StatelessWidget {
             hintText: 'مثال: محمود أحمد علي',
             prefixIcon: Icons.person_outline_rounded,
             initialValue: draft.fullName,
-            onChanged: (value) => onDraftChanged(draft.copyWith(fullName: value)),
+            onChanged: (value) =>
+                onDraftChanged(draft.copyWith(fullName: value)),
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'هذا الحقل مطلوب';
-              if (value.trim().split(' ').length < 3) return 'الرجاء إدخال الاسم ثلاثي على الأقل';
+              if (value == null || value.trim().isEmpty)
+                return 'هذا الحقل مطلوب';
+              if (value.trim().split(' ').length < 3)
+                return 'الرجاء إدخال الاسم ثلاثي على الأقل';
               return null;
             },
           ),
@@ -72,7 +75,8 @@ class RegistrationStep extends StatelessWidget {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(14),
             ],
-            onChanged: (value) => onDraftChanged(draft.copyWith(nationalId: value)),
+            onChanged: (value) =>
+                onDraftChanged(draft.copyWith(nationalId: value)),
             decoration: inputDecoration(
               hintText: '14 رقم',
               icon: Icons.credit_card_rounded,
@@ -100,7 +104,9 @@ class RegistrationStep extends StatelessWidget {
   }
 
   Widget _buildStep1(RegistrationDraft draft) {
-    final cityOptions = BeneficiaryOptions.citiesByGovernorate[draft.governorate] ?? const <String>[];
+    final cityOptions =
+        BeneficiaryOptions.citiesByGovernorate[draft.governorate] ??
+        const <String>[];
     return CardSection(
       children: [
         LabeledField(
@@ -110,9 +116,11 @@ class RegistrationStep extends StatelessWidget {
             hintText: 'الشارع، رقم المنزل، علامة مميزة',
             prefixIcon: Icons.home_outlined,
             initialValue: draft.address,
-            onChanged: (value) => onDraftChanged(draft.copyWith(address: value)),
+            onChanged: (value) =>
+                onDraftChanged(draft.copyWith(address: value)),
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return 'هذا الحقل مطلوب';
+              if (value == null || value.trim().isEmpty)
+                return 'هذا الحقل مطلوب';
               if (value.trim().length < 10) return 'يرجى إدخال عنوان مفصل';
               return null;
             },
@@ -130,13 +138,24 @@ class RegistrationStep extends StatelessWidget {
               icon: Icons.map_outlined,
             ),
             items: BeneficiaryOptions.governorates
-                .map((value) => DropdownMenuItem(value: value, child: Text(_governorateLabel(value))))
+                .map(
+                  (value) => DropdownMenuItem(
+                    value: value,
+                    child: Text(_governorateLabel(value)),
+                  ),
+                )
                 .toList(),
             onChanged: (value) {
               final nextGovernorate = value ?? '';
-              final nextCityOptions = BeneficiaryOptions.citiesByGovernorate[nextGovernorate] ?? const [];
-              final nextCity = nextCityOptions.contains(draft.city) ? draft.city : '';
-              onDraftChanged(draft.copyWith(governorate: nextGovernorate, city: nextCity));
+              final nextCityOptions =
+                  BeneficiaryOptions.citiesByGovernorate[nextGovernorate] ??
+                  const [];
+              final nextCity = nextCityOptions.contains(draft.city)
+                  ? draft.city
+                  : '';
+              onDraftChanged(
+                draft.copyWith(governorate: nextGovernorate, city: nextCity),
+              );
             },
           ),
         ),
@@ -145,7 +164,9 @@ class RegistrationStep extends StatelessWidget {
           child: LabeledField(
             key: ValueKey(draft.governorate),
             label: 'المدينة',
-            helper: draft.governorate.isEmpty ? 'اختار المحافظة أولًا' : 'المدن تظهر حسب المحافظة',
+            helper: draft.governorate.isEmpty
+                ? 'اختار المحافظة أولًا'
+                : 'المدن تظهر حسب المحافظة',
             isValid: draft.city.isNotEmpty,
             child: DropdownButtonFormField<String>(
               initialValue: draft.city.isEmpty ? null : draft.city,
@@ -154,8 +175,16 @@ class RegistrationStep extends StatelessWidget {
                 hintText: 'اختار المدينة',
                 icon: Icons.location_city_outlined,
               ),
-              items: cityOptions.map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(),
-              onChanged: cityOptions.isEmpty ? null : (value) => onDraftChanged(draft.copyWith(city: value ?? '')),
+              items: cityOptions
+                  .map(
+                    (value) =>
+                        DropdownMenuItem(value: value, child: Text(value)),
+                  )
+                  .toList(),
+              onChanged: cityOptions.isEmpty
+                  ? null
+                  : (value) =>
+                        onDraftChanged(draft.copyWith(city: value ?? '')),
             ),
           ),
         ),
@@ -170,12 +199,15 @@ class RegistrationStep extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'اختر العدد الأقرب للوضع الحالي',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         const SizedBox(height: 18),
         FamilySizeSelector(
           value: draft.familySize,
-          onChanged: (value) => onDraftChanged(draft.copyWith(familySize: value)),
+          onChanged: (value) =>
+              onDraftChanged(draft.copyWith(familySize: value)),
         ),
         const SizedBox(height: 24),
         SelectionGridWidget(
@@ -201,14 +233,20 @@ class RegistrationStep extends StatelessWidget {
               icon: Icons.account_balance_wallet_outlined,
             ),
           ],
-          onChanged: (value) => onDraftChanged(draft.copyWith(incomeStatus: value)),
+          onChanged: (value) =>
+              onDraftChanged(draft.copyWith(incomeStatus: value)),
         ),
         const Divider(height: 32),
-        const Text('تحويل المستحقات (فودافون كاش)', style: AppTextStyles.titleLarge),
+        const Text(
+          'تحويل المستحقات (فودافون كاش)',
+          style: AppTextStyles.titleLarge,
+        ),
         const SizedBox(height: 8),
         Text(
           'هل تريد استخدام رقم الهاتف المسجل به لاستلام المساعدات؟',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         const SizedBox(height: 16),
         Row(
@@ -217,7 +255,12 @@ class RegistrationStep extends StatelessWidget {
               child: ChoiceChipWidget(
                 label: 'نعم، نفس الرقم',
                 selected: draft.useSamePhoneForPayout,
-                onTap: () => onDraftChanged(draft.copyWith(useSamePhoneForPayout: true, payoutAccount: '')),
+                onTap: () => onDraftChanged(
+                  draft.copyWith(
+                    useSamePhoneForPayout: true,
+                    payoutAccount: '',
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -225,7 +268,9 @@ class RegistrationStep extends StatelessWidget {
               child: ChoiceChipWidget(
                 label: 'لا، رقم آخر',
                 selected: !draft.useSamePhoneForPayout,
-                onTap: () => onDraftChanged(draft.copyWith(useSamePhoneForPayout: false)),
+                onTap: () => onDraftChanged(
+                  draft.copyWith(useSamePhoneForPayout: false),
+                ),
               ),
             ),
           ],
@@ -235,15 +280,19 @@ class RegistrationStep extends StatelessWidget {
           LabeledField(
             label: 'رقم فودافون كاش البديل',
             helper: 'يجب أن يكون الرقم مسجلاً به خدمة فودافون كاش',
-            isValid: RegExp(r'^01[0125][0-9]{8}$').hasMatch(draft.payoutAccount),
+            isValid: RegExp(
+              r'^01[0125][0-9]{8}$',
+            ).hasMatch(draft.payoutAccount),
             child: CustomTextField(
               hintText: 'مثال: 01XXXXXXXXX',
               prefixIcon: Icons.account_balance_wallet_outlined,
               initialValue: draft.payoutAccount,
               keyboardType: TextInputType.phone,
-              onChanged: (value) => onDraftChanged(draft.copyWith(payoutAccount: value)),
+              onChanged: (value) =>
+                  onDraftChanged(draft.copyWith(payoutAccount: value)),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) return null; // Only validated when not empty
+                if (value == null || value.trim().isEmpty)
+                  return null; // Only validated when not empty
                 if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value.trim())) {
                   return 'يجب أن يكون الرقم 11 رقمًا ويبدأ بـ 01';
                 }
@@ -282,7 +331,8 @@ class RegistrationStep extends StatelessWidget {
               icon: Icons.accessible_forward_rounded,
             ),
           ],
-          onChanged: (value) => onDraftChanged(draft.copyWith(healthCondition: value)),
+          onChanged: (value) =>
+              onDraftChanged(draft.copyWith(healthCondition: value)),
         ),
       ],
     );

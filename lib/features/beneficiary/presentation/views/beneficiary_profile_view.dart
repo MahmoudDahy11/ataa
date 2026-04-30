@@ -133,7 +133,9 @@ class _BeneficiaryProfileBody extends StatelessWidget {
         ),
         ProfileInfoRow(
           label: 'رقم فودافون كاش',
-          value: (p.payoutAccount != null && p.payoutAccount!.isNotEmpty) ? p.payoutAccount! : p.phone,
+          value: (p.payoutAccount != null && p.payoutAccount!.isNotEmpty)
+              ? p.payoutAccount!
+              : p.phone,
           valueColor: AppColors.primary,
         ),
         ProfileInfoRow(

@@ -62,7 +62,9 @@ class LabeledField extends StatelessWidget {
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 180),
                 child: Icon(
-                  valid ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                  valid
+                      ? Icons.check_circle_rounded
+                      : Icons.info_outline_rounded,
                   key: ValueKey(valid),
                   color: valid ? AppColors.primary : AppColors.textHint,
                   size: 22,
@@ -119,7 +121,9 @@ class DatePickerTile extends StatelessWidget {
                   Text(
                     selected ? _formatDate(date!) : 'اختار التاريخ',
                     style: AppTextStyles.titleLarge.copyWith(
-                      color: selected ? AppColors.textPrimary : AppColors.textHint,
+                      color: selected
+                          ? AppColors.textPrimary
+                          : AppColors.textHint,
                     ),
                   ),
                 ],
@@ -146,7 +150,11 @@ class FamilySizeSelector extends StatelessWidget {
   final int value;
   final ValueChanged<int> onChanged;
 
-  const FamilySizeSelector({super.key, required this.value, required this.onChanged});
+  const FamilySizeSelector({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -275,10 +283,14 @@ class _SelectionCard extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withValues(alpha: 0.09) : AppColors.surface,
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.09)
+              : AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.05),
+            color: selected
+                ? AppColors.primary
+                : AppColors.primary.withValues(alpha: 0.05),
             width: selected ? 1.6 : 1,
           ),
         ),
@@ -322,7 +334,9 @@ class _SelectionCard extends StatelessWidget {
               scale: selected ? 1 : 0.75,
               duration: const Duration(milliseconds: 180),
               child: Icon(
-                selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked_rounded,
                 color: selected ? AppColors.primary : AppColors.textHint,
               ),
             ),
@@ -395,7 +409,9 @@ class ChoiceChipWidget extends StatelessWidget {
           color: selected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
+            color: selected
+                ? AppColors.primary
+                : AppColors.primary.withValues(alpha: 0.1),
             width: 1.2,
           ),
         ),
