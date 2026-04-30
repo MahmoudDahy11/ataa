@@ -14,3 +14,5 @@ class SplashNavigateHome extends SplashState {}
 class SplashNavigateToProfile extends SplashState {}
 
 class SplashNavigateToRegister extends SplashState {}
+
+class SplashNavigateToDonorSetup extends SplashState {}

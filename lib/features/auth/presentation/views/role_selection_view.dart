@@ -42,6 +42,8 @@ class _RoleSelectionViewBodyState extends State<RoleSelectionViewBody> {
           showSnakBar(context, 'Welcome as ${state.role}!');
           if (state.role == AppStrings.beneficiaryRole) {
             context.go(AppRouter.beneficiaryRegisterRoute);
+          } else if (state.role == AppStrings.donorRole) {
+            context.go(AppRouter.donorSetupRoute);
           }
         }
       },

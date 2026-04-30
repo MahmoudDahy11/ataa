@@ -26,22 +26,29 @@ class SplashCubit extends Cubit<SplashState> {
           throw 'User no longer exists';
         }
 
-        final isRegistered = box.get('is_registered', defaultValue: false);
-        if (isRegistered) {
-          emit(SplashNavigateToProfile());
-          return;
-        }
-
         // If authenticated but not registered locally, check if they have a role
+        final isRegistered = box.get('is_registered', defaultValue: false);
         final roleResult = await _authRepo.getUserRole(uid: currentUser.uid);
         final role = roleResult.fold((_) => null, (r) => r);
+
+        if (isRegistered) {
+          // User completed setup — go to their profile
+          if (role == AppStrings.donorRole) {
+            emit(SplashNavigateHome()); // Donor profile
+          } else {
+            emit(SplashNavigateToProfile()); // Beneficiary profile
+          }
+          return;
+        }
 
         if (role == null) {
           emit(SplashNavigateToOnboarding()); // Go pick a role
         } else if (role == AppStrings.beneficiaryRole) {
           emit(SplashNavigateToRegister()); // Go complete registration
+        } else if (role == AppStrings.donorRole) {
+          emit(SplashNavigateToDonorSetup()); // Donor needs setup
         } else {
-          emit(SplashNavigateHome()); // Donor dashboard or similar
+          emit(SplashNavigateHome());
         }
       } catch (e) {
         await _auth.signOut();

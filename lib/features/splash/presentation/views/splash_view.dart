@@ -42,6 +42,12 @@ class SplashViewBody extends StatelessWidget {
         } else if (state is SplashNavigateToRegister) {
           context.go(AppRouter.beneficiaryRegisterRoute);
           showSnakBar(context, 'برجاء إكمال بيانات التسجيل...');
+        } else if (state is SplashNavigateHome) {
+          context.go(AppRouter.donorProfileRoute);
+          showSnakBar(context, 'مرحباً بعودتك!');
+        } else if (state is SplashNavigateToDonorSetup) {
+          context.go(AppRouter.donorSetupRoute);
+          showSnakBar(context, 'برجاء إكمال بيانات حسابك...');
         }
       },
       child: const Scaffold(
