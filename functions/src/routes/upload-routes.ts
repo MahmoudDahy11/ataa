@@ -12,27 +12,37 @@ import { buildFileKey, validateFile } from "../utils/file-utils";
 
 export const uploadRouter = Router();
 
-uploadRouter.post("/init", requireAuth, async (request, response) => {
-  const { fileName = "", mimeType = "", sizeBytes = 0 } = request.body ?? {};
-  validateFile(String(mimeType), Number(sizeBytes));
-  const fileKey = buildFileKey((request as AuthedRequest).userId, String(fileName), String(mimeType));
-  await createUploadSession(fileKey, (request as AuthedRequest).userId);
-  const url = await createUploadUrl(fileKey, String(mimeType));
-  response.json({ url, fileKey });
+uploadRouter.post("/init", requireAuth, async (request, response, next) => {
+  try {
+    const { fileName = "", mimeType = "", sizeBytes = 0 } = request.body ?? {};
+    validateFile(String(mimeType), Number(sizeBytes));
+    const fileKey = buildFileKey((request as AuthedRequest).userId, String(fileName), String(mimeType));
+    await createUploadSession(fileKey, (request as AuthedRequest).userId);
+    const url = await createUploadUrl(fileKey, String(mimeType));
+    response.json({ url, fileKey });
+  } catch (error) {
+    console.error("[POST /upload/init] Error:", error);
+    next(error);
+  }
 });
 
-uploadRouter.post("/confirm", requireAuth, async (request, response) => {
-  const { fileKey = "", type = "", fileName = "", mimeType = "", sizeBytes = 0 } = request.body ?? {};
-  validateFile(String(mimeType), Number(sizeBytes));
-  await validateUploadSession(String(fileKey), (request as AuthedRequest).userId);
-  const document = await createDocument({
-    fileKey: String(fileKey),
-    fileName: String(fileName),
-    mimeType: String(mimeType),
-    ownerId: (request as AuthedRequest).userId,
-    sizeBytes: Number(sizeBytes),
-    type: String(type),
-  });
-  await markUploadSessionUsed(String(fileKey));
-  response.json(document);
+uploadRouter.post("/confirm", requireAuth, async (request, response, next) => {
+  try {
+    const { fileKey = "", type = "", fileName = "", mimeType = "", sizeBytes = 0 } = request.body ?? {};
+    validateFile(String(mimeType), Number(sizeBytes));
+    await validateUploadSession(String(fileKey), (request as AuthedRequest).userId);
+    const document = await createDocument({
+      fileKey: String(fileKey),
+      fileName: String(fileName),
+      mimeType: String(mimeType),
+      ownerId: (request as AuthedRequest).userId,
+      sizeBytes: Number(sizeBytes),
+      type: String(type),
+    });
+    await markUploadSessionUsed(String(fileKey));
+    response.json(document);
+  } catch (error) {
+    console.error("[POST /upload/confirm] Error:", error);
+    next(error);
+  }
 });

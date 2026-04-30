@@ -77,7 +77,9 @@ class UploadRepositoryImpl implements UploadRepository {
         ),
       );
     } on DioException catch (error) {
-      return Left(ServerFailure.fromDioException(error, requestStage: 'confirm'));
+      return Left(
+        ServerFailure.fromDioException(error, requestStage: 'confirm'),
+      );
     } catch (error) {
       return Left(AuthFailure.fromGenericError(error));
     }
