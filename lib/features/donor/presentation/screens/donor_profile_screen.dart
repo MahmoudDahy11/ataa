@@ -1,11 +1,15 @@
+import 'package:ataa/core/helper/show_snak_bar.dart';
+import 'package:ataa/core/router/app_router.dart';
 import 'package:ataa/core/theme/app_colors.dart';
 import 'package:ataa/core/theme/app_text_styles.dart';
+import 'package:ataa/core/widgets/custom_textfield.dart';
 import 'package:ataa/features/donor/domain/entities/donation_history_entity.dart';
 import 'package:ataa/features/donor/domain/entities/donor_entity.dart';
 import 'package:ataa/features/donor/presentation/cubit/donor_profile_cubit.dart';
 import 'package:ataa/features/donor/presentation/cubit/donor_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/donation_history_item.dart';
 import '../widgets/donor_stat_card.dart';
@@ -27,7 +31,14 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<DonorProfileCubit, DonorProfileState>(
+      body: BlocConsumer<DonorProfileCubit, DonorProfileState>(
+        listener: (context, state) {
+          if (state is DonorNameUpdated) {
+            showSnakBar(context, 'تم تحديث الاسم بنجاح');
+          } else if (state is DonorSignedOut) {
+            context.go(AppRouter.phoneInputRoute);
+          }
+        },
         builder: (context, state) {
           if (state is DonorProfileLoading || state is DonorProfileInitial) {
             return const Center(child: CircularProgressIndicator());
@@ -56,25 +67,29 @@ class _ProfileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        _ProfileAppBar(donor: donor),
-        SliverToBoxAdapter(child: _StatsSection(donor: donor)),
-        const SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(24, 24, 24, 8),
-            child: Text('سجل التبرعات', style: AppTextStyles.titleMedium),
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () => context.read<DonorProfileCubit>().loadProfile(),
+      child: CustomScrollView(
+        slivers: [
+          _ProfileAppBar(donor: donor),
+          SliverToBoxAdapter(child: _StatsSection(donor: donor)),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 8),
+              child: Text('سجل التبرعات', style: AppTextStyles.titleMedium),
+            ),
           ),
-        ),
-        history.isEmpty
-            ? const SliverFillRemaining(child: _EmptyHistory())
-            : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (_, i) => DonationHistoryItem(donation: history[i]),
-                  childCount: history.length,
+          history.isEmpty
+              ? const SliverFillRemaining(child: _EmptyHistory())
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) => DonationHistoryItem(donation: history[i]),
+                    childCount: history.length,
+                  ),
                 ),
-              ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -88,6 +103,56 @@ class _ProfileAppBar extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.logout, color: Colors.white),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                backgroundColor: AppColors.surface,
+                title: const Text(
+                  'تسجيل الخروج',
+                  style: AppTextStyles.titleMedium,
+                ),
+                content: const Text(
+                  'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+                  style: AppTextStyles.bodyMedium,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(
+                      'إلغاء',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      context.read<DonorProfileCubit>().signOut();
+                    },
+                    child: Text(
+                      'خروج',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           color: AppColors.primary,
@@ -106,15 +171,70 @@ class _ProfileAppBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                donor.name,
-                style: AppTextStyles.headlineMedium.copyWith(
-                  color: Colors.white,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    donor.name,
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                    onPressed: () => _showEditNameDialog(context),
+                  ),
+                ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showEditNameDialog(BuildContext context) {
+    final controller = TextEditingController(text: donor.name);
+    final cubit = context.read<DonorProfileCubit>();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text('تعديل الاسم', style: AppTextStyles.titleMedium),
+        content: CustomTextField(
+          hintText: 'الاسم الجديد',
+          controller: controller,
+          prefixIcon: Icons.person_outline,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'إلغاء',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                cubit.updateName(controller.text.trim());
+                Navigator.pop(context);
+              }
+            },
+            child: Text(
+              'حفظ',
+              style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

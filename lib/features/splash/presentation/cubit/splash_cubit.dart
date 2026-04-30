@@ -53,10 +53,20 @@ class SplashCubit extends Cubit<SplashState> {
       } catch (e) {
         await _auth.signOut();
         await box.put('is_registered', false);
-        emit(SplashNavigateToOnboarding());
+        final isFirstTime = box.get('is_first_time', defaultValue: true);
+        if (isFirstTime) {
+          emit(SplashNavigateToOnboarding());
+        } else {
+          emit(SplashNavigateToAuth());
+        }
       }
     } else {
-      emit(SplashNavigateToOnboarding());
+      final isFirstTime = box.get('is_first_time', defaultValue: true);
+      if (isFirstTime) {
+        emit(SplashNavigateToOnboarding());
+      } else {
+        emit(SplashNavigateToAuth());
+      }
     }
   }
 }

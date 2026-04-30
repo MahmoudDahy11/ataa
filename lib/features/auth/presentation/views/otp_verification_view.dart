@@ -149,6 +149,8 @@ class _OtpVerificationViewBodyState extends State<OtpVerificationViewBody> {
       showSnakBar(context, 'Welcome back as ${state.role}!');
       if (state.role == AppStrings.beneficiaryRole) {
         context.go(AppRouter.beneficiaryDashboardRoute);
+      } else if (state.role == AppStrings.donorRole) {
+        context.go(AppRouter.donorProfileRoute);
       }
     }
   }

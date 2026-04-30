@@ -201,10 +201,50 @@ class _BeneficiaryProfileBody extends StatelessWidget {
                 'تسجيل الخروج',
                 style: TextStyle(color: Colors.redAccent),
               ),
-              onTap: () async {
-                await sl<AuthRepo>().signOut();
-                await Hive.box('app_config').put('is_registered', false);
-                if (context.mounted) context.go(AppRouter.onboardingRoute);
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    backgroundColor: AppColors.surface,
+                    title: const Text(
+                      'تسجيل الخروج',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text(
+                          'إلغاء',
+                          style: TextStyle(color: AppColors.primary),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(dialogContext); // Close dialog
+                          Navigator.pop(context); // Close bottom sheet
+                          await sl<AuthRepo>().signOut();
+                          await Hive.box(
+                            'app_config',
+                          ).put('is_registered', false);
+                          if (context.mounted) {
+                            context.go(AppRouter.phoneInputRoute);
+                          }
+                        },
+                        child: const Text(
+                          'خروج',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],

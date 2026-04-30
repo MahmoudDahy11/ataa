@@ -18,7 +18,6 @@ import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_cubit.d
 import 'package:ataa/features/donor/data/datasources/donor_local_datasource.dart';
 import 'package:ataa/features/donor/data/datasources/donor_remote_datasource.dart';
 import 'package:ataa/features/donor/data/datasources/donor_remote_datasource_impl.dart';
-import 'package:ataa/features/donor/data/models/donor_hive_model.dart';
 import 'package:ataa/features/donor/data/repositories/donor_repository_impl.dart';
 import 'package:ataa/features/donor/domain/repositories/donor_repository.dart';
 import 'package:ataa/features/donor/domain/usecases/get_donation_history.dart';
@@ -153,6 +152,7 @@ void setupServiceLocator() {
     () => DonorProfileCubit(
       getDonorProfile: sl<GetDonorProfile>(),
       getDonationHistory: sl<GetDonationHistory>(),
+      saveDonorProfile: sl<SaveDonorProfile>(),
       auth: sl<FirebaseAuth>(),
     ),
   );

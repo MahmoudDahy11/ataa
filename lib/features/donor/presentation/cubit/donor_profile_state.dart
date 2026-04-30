@@ -18,3 +18,7 @@ class DonorProfileError extends DonorProfileState {
   final String message;
   DonorProfileError(this.message);
 }
+
+class DonorNameUpdated extends DonorProfileState {}
+
+class DonorSignedOut extends DonorProfileState {}
