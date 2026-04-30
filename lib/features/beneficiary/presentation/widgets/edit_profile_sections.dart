@@ -29,10 +29,12 @@ class PersonalInfoSection extends StatelessWidget {
             onChanged: (v) => onChanged(draft.copyWith(fullName: v)),
             prefixIcon: Icons.person_outline,
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'هذا الحقل مطلوب';
-              if (value.trim().split(' ').length < 3)
+              }
+              if (value.trim().split(' ').length < 3) {
                 return 'الرجاء إدخال الاسم ثلاثي على الأقل';
+              }
               return null;
             },
           ),
@@ -45,8 +47,9 @@ class PersonalInfoSection extends StatelessWidget {
             onChanged: (v) => onChanged(draft.copyWith(address: v)),
             prefixIcon: Icons.location_on_outlined,
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'هذا الحقل مطلوب';
+              }
               if (value.trim().length < 10) return 'يرجى إدخال عنوان مفصل';
               return null;
             },

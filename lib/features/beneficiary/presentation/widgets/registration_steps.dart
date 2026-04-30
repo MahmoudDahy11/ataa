@@ -53,10 +53,12 @@ class RegistrationStep extends StatelessWidget {
             onChanged: (value) =>
                 onDraftChanged(draft.copyWith(fullName: value)),
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'هذا الحقل مطلوب';
-              if (value.trim().split(' ').length < 3)
+              }
+              if (value.trim().split(' ').length < 3) {
                 return 'الرجاء إدخال الاسم ثلاثي على الأقل';
+              }
               return null;
             },
           ),
@@ -119,8 +121,9 @@ class RegistrationStep extends StatelessWidget {
             onChanged: (value) =>
                 onDraftChanged(draft.copyWith(address: value)),
             validator: (value) {
-              if (value == null || value.trim().isEmpty)
+              if (value == null || value.trim().isEmpty) {
                 return 'هذا الحقل مطلوب';
+              }
               if (value.trim().length < 10) return 'يرجى إدخال عنوان مفصل';
               return null;
             },
@@ -291,8 +294,9 @@ class RegistrationStep extends StatelessWidget {
               onChanged: (value) =>
                   onDraftChanged(draft.copyWith(payoutAccount: value)),
               validator: (value) {
-                if (value == null || value.trim().isEmpty)
+                if (value == null || value.trim().isEmpty) {
                   return null; // Only validated when not empty
+                }
                 if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value.trim())) {
                   return 'يجب أن يكون الرقم 11 رقمًا ويبدأ بـ 01';
                 }
