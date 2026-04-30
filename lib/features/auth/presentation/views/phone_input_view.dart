@@ -31,6 +31,7 @@ class PhoneInputViewBody extends StatefulWidget {
 }
 
 class _PhoneInputViewBodyState extends State<PhoneInputViewBody> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
 
   @override
@@ -68,53 +69,67 @@ class _PhoneInputViewBodyState extends State<PhoneInputViewBody> {
           ),
           body: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Enter your phone number',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Enter your phone number',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'We will send you a 6-digit OTP code to verify your account.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
+                  const SizedBox(height: 8),
+                  const Text(
+                    'We will send you a 6-digit OTP code to verify your account.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                CustomTextField(
-                  hintText: 'Phone Number (e.g. +201XXXXXXXXX)',
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  prefixIcon: Icons.phone_android_rounded,
-                ),
-                const Spacer(),
-                CustomGradientButton(
-                  text: 'Continue',
-                  isLoading: state is AuthLoading,
-                  onPressed: () => _onSubmit(context),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: TextButton(
-                    onPressed: () =>
-                        context.go(AppRouter.beneficiaryDashboardRoute),
-                    child: const Text(
-                      'Continue as Guest',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 32),
+                  CustomTextField(
+                    hintText: 'Phone Number (e.g. 01XXXXXXXXX)',
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    prefixIcon: Icons.phone_android_rounded,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return AppStrings.phoneEmpty;
+                      }
+                      if (!RegExp(
+                        r'^01[0125][0-9]{8}$',
+                      ).hasMatch(value.trim())) {
+                        return 'يجب أن يكون الرقم 11 رقمًا ويبدأ بـ 01';
+                      }
+                      return null;
+                    },
+                  ),
+                  const Spacer(),
+                  CustomGradientButton(
+                    text: 'Continue',
+                    isLoading: state is AuthLoading,
+                    onPressed: () => _onSubmit(context),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: TextButton(
+                      onPressed: () =>
+                          context.go(AppRouter.beneficiaryDashboardRoute),
+                      child: const Text(
+                        'Continue as Guest',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -123,11 +138,9 @@ class _PhoneInputViewBodyState extends State<PhoneInputViewBody> {
   }
 
   void _onSubmit(BuildContext context) {
-    final phone = _phoneController.text.trim();
-    if (phone.isEmpty) {
-      showSnakBar(context, AppStrings.phoneEmpty, isError: true);
-      return;
+    if (_formKey.currentState?.validate() ?? false) {
+      final phone = _phoneController.text.trim();
+      context.read<AuthCubit>().submitPhone(phone);
     }
-    context.read<AuthCubit>().submitPhone(phone);
   }
 }

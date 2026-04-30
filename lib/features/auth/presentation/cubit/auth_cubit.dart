@@ -21,7 +21,12 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> submitPhone(String phone) async {
     emit(AuthLoading());
 
-    final result = await _authRepo.verifyPhone(phone: phone);
+    String firebasePhone = phone;
+    if (phone.startsWith('01') && phone.length == 11) {
+      firebasePhone = '+20${phone.substring(1)}';
+    }
+
+    final result = await _authRepo.verifyPhone(phone: firebasePhone);
 
     result.fold((failure) => emit(AuthError(failure.errMessage)), (
       verificationId,
