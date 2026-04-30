@@ -8,6 +8,7 @@ import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_state.d
 import 'package:ataa/features/beneficiary/presentation/cubit/case_draft.dart';
 import 'package:ataa/features/beneficiary/presentation/cubit/registration_draft.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 part 'beneficiary_cubit_validation.dart';
 
@@ -89,6 +90,7 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
       beneficiary: state.registrationDraft.toEntity(id: currentUserId),
     );
     result.fold(_emitFailure, (profile) {
+      Hive.box('app_config').put('is_registered', true);
       emit(
         state.copyWith(
           isSubmittingRegistration: false,

@@ -28,14 +28,12 @@ class DocumentUploadWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<UploadCubit, UploadState>(
       listener: (context, state) {
-        if (state.status == UploadStatus.success && state.document != null) {
+        if (state is UploadSuccess) {
           showSnakBar(context, 'تم رفع الملف بنجاح');
-          onUploaded(state.document!);
+          onUploaded(state.document);
         }
-        if ((state.status == UploadStatus.error ||
-                state.status == UploadStatus.retry) &&
-            state.errorMessage != null) {
-          showSnakBar(context, state.errorMessage!, isError: true);
+        if (state is UploadFailure) {
+          showSnakBar(context, state.message, isError: true);
         }
       },
       builder: (context, state) {
@@ -43,8 +41,9 @@ class DocumentUploadWidget extends StatelessWidget {
         return DocumentUploadCard(
           label: label,
           helperText: helperText,
-          uploadedFileName: state.document?.fileName ?? uploadedFileName,
-          isUploaded: isUploaded || state.status == UploadStatus.success,
+          uploadedFileName:
+              (state is UploadSuccess) ? state.document.fileName : uploadedFileName,
+          isUploaded: isUploaded || state is UploadSuccess,
           state: state,
           onPick: cubit.pickFile,
           onUpload: () => cubit.upload(documentType),

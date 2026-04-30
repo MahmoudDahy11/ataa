@@ -8,3 +8,7 @@ class SplashInitial extends SplashState {}
 class SplashNavigateToOnboarding extends SplashState {}
 
 class SplashNavigateToAuth extends SplashState {}
+
+class SplashNavigateHome extends SplashState {}
+
+class SplashNavigateToProfile extends SplashState {}

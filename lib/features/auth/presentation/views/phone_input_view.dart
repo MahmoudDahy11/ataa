@@ -100,6 +100,20 @@ class _PhoneInputViewBodyState extends State<PhoneInputViewBody> {
                   isLoading: state is AuthLoading,
                   onPressed: () => _onSubmit(context),
                 ),
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton(
+                    onPressed: () =>
+                        context.go(AppRouter.beneficiaryDashboardRoute),
+                    child: const Text(
+                      'Continue as Guest',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

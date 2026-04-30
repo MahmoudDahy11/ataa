@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:ataa/features/auth/domain/repo/auth_repo.dart';
 import 'package:ataa/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 /// Handles all authentication logic through [AuthRepo].
 /// Uses dartz Either for functional error handling.
@@ -49,6 +50,7 @@ class AuthCubit extends Cubit<AuthState> {
       final roleResult = await _authRepo.getUserRole(uid: uid);
       roleResult.fold((failure) => emit(AuthOTPVerified(uid: uid)), (role) {
         if (role != null) {
+          Hive.box('app_config').put('is_registered', true);
           emit(AuthRoleSelected(role));
         } else {
           emit(AuthOTPVerified(uid: uid));

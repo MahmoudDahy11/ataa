@@ -23,8 +23,8 @@ void main() {
 
       await cubit.upload('id_card');
 
-      expect(cubit.state.status, UploadStatus.error);
-      expect(cubit.state.errorMessage, contains('غير مدعوم'));
+      expect(cubit.state, isA<UploadFailure>());
+      expect((cubit.state as UploadFailure).message, contains('غير مدعوم'));
     });
 
     test('uploads and confirms successfully', () async {
@@ -37,9 +37,10 @@ void main() {
 
       await cubit.upload('id_card');
 
-      expect(cubit.state.status, UploadStatus.success);
-      expect(cubit.state.fileKey, 'users/uid/documents/file.jpg');
-      expect(cubit.state.document?.type, 'id_card');
+      expect(cubit.state, isA<UploadSuccess>());
+      final success = cubit.state as UploadSuccess;
+      expect(success.fileKey, 'users/uid/documents/file.jpg');
+      expect(success.document.type, 'id_card');
     });
 
     test('keeps fileKey for confirm retry', () async {
@@ -51,11 +52,12 @@ void main() {
       )..selectFile(_file());
 
       await cubit.upload('id_card');
-      expect(cubit.state.status, UploadStatus.retry);
-      expect(cubit.state.retryConfirm, isTrue);
+      expect(cubit.state, isA<UploadFailure>());
+      final failure = cubit.state as UploadFailure;
+      expect(failure.canRetryConfirm, isTrue);
 
       await cubit.retry();
-      expect(cubit.state.status, UploadStatus.success);
+      expect(cubit.state, isA<UploadSuccess>());
     });
   });
 }

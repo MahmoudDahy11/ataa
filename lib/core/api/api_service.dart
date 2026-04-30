@@ -11,66 +11,58 @@ class ApiService {
     required String url,
     required String contentType,
     required Map<String, dynamic> body,
-    required String token,
     Map<String, dynamic>? headers,
   }) async {
-    final response = await _dio.post(
+    return _dio.post(
       url,
       data: body,
-      options: Options(
-        contentType: contentType,
-        headers: {'Authorization': 'Bearer $token', ...?headers},
-      ),
+      options: Options(contentType: contentType, headers: headers),
     );
-    return response;
   }
 
   Future<Response<dynamic>> get({
     required String url,
-    required String token,
     Map<String, dynamic>? queryParameters,
   }) async {
-    final response = await _dio.get(
-      url,
-      queryParameters: queryParameters,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
-    return response;
+    return _dio.get(url, queryParameters: queryParameters);
   }
 
   Future<Response<dynamic>> postJson({
     required String url,
     required Map<String, dynamic> body,
-    String? token,
     Map<String, dynamic>? headers,
   }) {
     return _dio.post(
       url,
       data: body,
-      options: Options(
-        contentType: Headers.jsonContentType,
-        headers: {
-          if (token != null && token.isNotEmpty)
-            'Authorization': 'Bearer $token',
-          ...?headers,
-        },
-      ),
+      options: Options(contentType: Headers.jsonContentType, headers: headers),
     );
   }
 
   Future<Response<dynamic>> putBytes({
     required String url,
     required List<int> bytes,
-    required String contentType,
-    Map<String, dynamic>? headers,
-    void Function(int sent, int total)? onSendProgress,
+    required String mimeType,
+    void Function(double progress)? onProgress,
   }) async {
-    final response = await _dio.put(
+    // We use a fresh Dio instance for external storage uploads to avoid
+    // global interceptors (like AuthInterceptor) and headers (like ngrok-skip-browser-warning)
+    // from interfering with the pre-signed URL signature.
+    final uploadDio = Dio();
+    return uploadDio.put(
       url,
       data: bytes,
-      onSendProgress: onSendProgress,
-      options: Options(contentType: contentType, headers: headers),
+      options: Options(
+        headers: {
+          Headers.contentTypeHeader: mimeType,
+          Headers.contentLengthHeader: bytes.length,
+        },
+      ),
+      onSendProgress: (sent, total) {
+        if (total > 0 && onProgress != null) {
+          onProgress(sent / total);
+        }
+      },
     );
-    return response;
   }
 }

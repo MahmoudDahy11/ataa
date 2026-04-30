@@ -1,3 +1,4 @@
+import 'package:ataa/core/di/service_locator.dart';
 import 'package:ataa/core/helper/show_snak_bar.dart';
 import 'package:ataa/core/router/app_router.dart';
 import 'package:ataa/core/theme/app_colors.dart';
@@ -13,7 +14,7 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SplashCubit()..checkFirstTimeLaunch(),
+      create: (context) => sl<SplashCubit>()..checkFirstTimeLaunch(),
       child: const SplashViewBody(),
     );
   }
@@ -35,6 +36,9 @@ class SplashViewBody extends StatelessWidget {
         } else if (state is SplashNavigateToAuth) {
           context.go(AppRouter.phoneInputRoute);
           showSnakBar(context, 'Welcome back! Please sign in to continue.');
+        } else if (state is SplashNavigateToProfile) {
+          context.go(AppRouter.beneficiaryProfileRoute);
+          showSnakBar(context, 'Redirecting to your profile...');
         }
       },
       child: const Scaffold(

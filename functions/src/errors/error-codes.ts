@@ -6,6 +6,8 @@ export const ErrorCode = {
   uploadSessionNotFound: "UPLOAD_SESSION_NOT_FOUND",
   uploadSessionExpired: "UPLOAD_SESSION_EXPIRED",
   uploadAlreadyConfirmed: "UPLOAD_ALREADY_CONFIRMED",
+  uploadNotFound: "UPLOAD_NOT_FOUND",
+  rateLimited: "RATE_LIMITED",
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];

@@ -9,11 +9,13 @@ const sessions = () => getFirestore().collection("upload_sessions");
 export async function createUploadSession(
   fileKey: string,
   userId: string,
+  sizeBytes: number,
 ): Promise<void> {
   const expiresAt = Timestamp.fromMillis(Date.now() + 10 * 60 * 1000);
   await sessions().doc(sessionId(fileKey)).set({
     fileKey,
     userId,
+    sizeBytes,
     used: false,
     expiresAt,
     createdAt: Timestamp.now(),
@@ -23,7 +25,7 @@ export async function createUploadSession(
 export async function validateUploadSession(
   fileKey: string,
   userId: string,
-): Promise<void> {
+): Promise<FirebaseFirestore.DocumentData> {
   const snapshot = await sessions().doc(sessionId(fileKey)).get();
   const data = snapshot.data();
   if (!snapshot.exists || !data)
@@ -33,6 +35,7 @@ export async function validateUploadSession(
   if (data.expiresAt?.toMillis?.() <= Date.now()) {
     throw new HttpError(410, ErrorCode.uploadSessionExpired);
   }
+  return data;
 }
 
 export async function markUploadSessionUsed(fileKey: string): Promise<void> {
@@ -41,3 +44,17 @@ export async function markUploadSessionUsed(fileKey: string): Promise<void> {
     usedAt: Timestamp.now(),
   });
 }
+
+export async function countActiveSessions(userId: string): Promise<number> {
+  const snap = await sessions()
+    .where("userId", "==", userId)
+    .where("used", "==", false)
+    .get();
+  
+  const now = Date.now();
+  return snap.docs.filter((doc) => {
+    const data = doc.data();
+    return data.expiresAt && data.expiresAt.toMillis() > now;
+  }).length;
+}
+

@@ -28,17 +28,18 @@ class DocumentUploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final busy =
-        state.status == UploadStatus.loading ||
-        state.status == UploadStatus.progress;
+    final busy = state is UploadLoading || state is UploadInProgress;
+    final progress =
+        state is UploadInProgress ? (state as UploadInProgress).progress : null;
     final fileName = state.file?.name ?? uploadedFileName ?? '';
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isUploaded
+          color: isUploaded || state is UploadSuccess
               ? AppColors.primary.withValues(alpha: 0.55)
               : AppColors.primary.withValues(alpha: 0.1),
         ),
@@ -46,7 +47,10 @@ class DocumentUploadCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          UploadPreview(file: state.file, isUploaded: isUploaded),
+          UploadPreview(
+            file: state.file,
+            isUploaded: isUploaded || state is UploadSuccess,
+          ),
           const SizedBox(height: 16),
           Text(
             label,
@@ -70,7 +74,7 @@ class DocumentUploadCard extends StatelessWidget {
           if (busy) ...[
             const SizedBox(height: 14),
             LinearProgressIndicator(
-              value: state.progress == 0 ? null : state.progress,
+              value: progress == 0 ? null : progress,
             ),
           ],
           const SizedBox(height: 18),
@@ -85,7 +89,7 @@ class DocumentUploadCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (state.file != null) ...[
+              if (state.file != null && state is! UploadSuccess) ...[
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
@@ -96,8 +100,7 @@ class DocumentUploadCard extends StatelessWidget {
               ],
             ],
           ),
-          if (state.status == UploadStatus.error ||
-              state.status == UploadStatus.retry) ...[
+          if (state is UploadFailure) ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: onRetry,

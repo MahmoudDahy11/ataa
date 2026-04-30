@@ -72,8 +72,9 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
   }) async {
     return _handle<CaseEntity>(() async {
       final p = await _dataSource.getProfile();
-      if (p.status != BeneficiaryStatus.approved)
+      if (p.status != BeneficiaryStatus.approved) {
         throw 'Approval is required first.';
+      }
       return _dataSource.saveDraftCase(draft: CaseModel.fromEntity(draft));
     });
   }
@@ -84,8 +85,9 @@ class BeneficiaryRepoImpl implements BeneficiaryRepo {
   }) async {
     return _handle<CaseEntity>(() async {
       final p = await _dataSource.getProfile();
-      if (p.status != BeneficiaryStatus.approved)
+      if (p.status != BeneficiaryStatus.approved) {
         throw 'Approval is required first.';
+      }
       return _dataSource.submitCaseForReview(caseId: caseId);
     });
   }

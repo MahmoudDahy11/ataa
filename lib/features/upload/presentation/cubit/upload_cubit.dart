@@ -12,31 +12,23 @@ class UploadCubit extends Cubit<UploadState> {
   final UploadRepository _repository;
 
   UploadCubit(this._initUpload, this._confirmUpload, this._repository)
-    : super(const UploadState());
+    : super(const UploadInitial());
 
   Future<void> pickFile() async {
     final file = await pickUploadFile();
-    if (file != null) selectFile(file);
+    if (file != null) emit(UploadInitial(file: file));
   }
 
-  void selectFile(UploadFile file) {
-    emit(UploadState(file: file));
-  }
+  void selectFile(UploadFile file) => emit(UploadInitial(file: file));
 
   Future<void> upload(String type) async {
     final file = state.file;
-    final error = file == null ? 'اختر ملفًا أولًا' : validateUploadFile(file);
-    if (error != null || file == null) return _fail(error!, type: type);
-    emit(
-      state.copyWith(
-        status: UploadStatus.loading,
-        progress: 0,
-        pendingType: type,
-        clearError: true,
-        clearFileKey: true,
-        clearDocument: true,
-      ),
-    );
+    if (file == null) return _fail('اختر ملفًا أولًا', type: type);
+    final error = validateUploadFile(file);
+    if (error != null) return _fail(error, type: type);
+
+    emit(UploadLoading(file: file, pendingType: type));
+
     final initResult = await _initUpload(file);
     await initResult.fold(
       (failure) async => _fail(failure.errMessage, type: type),
@@ -45,12 +37,12 @@ class UploadCubit extends Cubit<UploadState> {
           url: upload.url,
           bytes: file.bytes,
           mimeType: file.mimeType,
-          onProgress: (progress) => emit(
-            state.copyWith(status: UploadStatus.progress, progress: progress),
+          onProgress: (p) => emit(
+            UploadInProgress(file: file, pendingType: type, progress: p),
           ),
         );
         await sent.fold(
-          (failure) async => _fail(failure.errMessage, type: type),
+          (f) async => _fail(f.errMessage, type: type),
           (_) => _confirm(type: type, file: file, fileKey: upload.fileKey),
         );
       },
@@ -58,15 +50,12 @@ class UploadCubit extends Cubit<UploadState> {
   }
 
   Future<void> retry() async {
-    final type = state.pendingType;
-    final file = state.file;
-    if (type == null || file == null) {
-      return;
+    final s = state;
+    if (s is! UploadFailure || s.pendingType == null || s.file == null) return;
+    if (s.canRetryConfirm && s.fileKey != null) {
+      return _confirm(type: s.pendingType!, file: s.file!, fileKey: s.fileKey!);
     }
-    if (state.retryConfirm && state.fileKey != null) {
-      return _confirm(type: type, file: file, fileKey: state.fileKey!);
-    }
-    await upload(type);
+    await upload(s.pendingType!);
   }
 
   Future<void> _confirm({
@@ -74,45 +63,34 @@ class UploadCubit extends Cubit<UploadState> {
     required UploadFile file,
     required String fileKey,
   }) async {
-    final result = await _confirmUpload(
-      fileKey: fileKey,
-      type: type,
-      file: file,
-    );
+    final result =
+        await _confirmUpload(fileKey: fileKey, type: type, file: file);
     result.fold(
-      (failure) => _fail(
-        failure.errMessage,
-        type: type,
-        fileKey: fileKey,
-        retryConfirm: true,
-      ),
-      (document) => emit(
-        state.copyWith(
-          status: UploadStatus.success,
-          progress: 1,
-          fileKey: fileKey,
+      (f) => _fail(f.errMessage, type: type, fileKey: fileKey, canRetry: true),
+      (doc) => emit(
+        UploadSuccess(
+          file: file,
           pendingType: type,
-          retryConfirm: false,
-          document: document,
-          clearError: true,
+          fileKey: fileKey,
+          document: doc,
         ),
       ),
     );
   }
 
   void _fail(
-    String message, {
+    String msg, {
     required String type,
     String? fileKey,
-    bool retryConfirm = false,
+    bool canRetry = false,
   }) {
     emit(
-      state.copyWith(
-        status: retryConfirm ? UploadStatus.retry : UploadStatus.error,
-        errorMessage: message,
+      UploadFailure(
+        file: state.file,
         pendingType: type,
+        message: msg,
         fileKey: fileKey,
-        retryConfirm: retryConfirm,
+        canRetryConfirm: canRetry,
       ),
     );
   }

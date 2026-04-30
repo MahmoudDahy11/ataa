@@ -129,7 +129,12 @@ class ServerFailure extends CustomFailure {
   static String? _extractCode(Map<String, dynamic> data) {
     final error = data['error'];
 
-    if (error is String) return error;
+    if (error is String) {
+      // Try to extract from XML if present
+      final codeMatch = RegExp(r'<Code>(.*?)</Code>').firstMatch(error);
+      if (codeMatch != null) return codeMatch.group(1);
+      return error;
+    }
 
     if (error is Map) {
       final map = Map<String, dynamic>.from(error);
@@ -194,6 +199,12 @@ class ServerFailure extends CustomFailure {
 
       case 'UPLOAD_ALREADY_CONFIRMED':
         return 'تم تأكيد هذا الملف بالفعل.';
+
+      case 'SignatureDoesNotMatch':
+        return 'خطأ في التوقيع الرقمي للملف. تم إصلاح هذا المشكلة، يرجى المحاولة مرة أخرى.';
+
+      case 'AccessDenied':
+        return 'تم رفض الوصول إلى وحدة التخزين.';
 
       default:
         return 'خطأ غير معروف من السيرفر.';

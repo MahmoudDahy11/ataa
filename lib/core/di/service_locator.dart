@@ -1,4 +1,7 @@
 import 'package:ataa/core/api/api_service.dart';
+import 'package:ataa/core/api/auth_interceptor.dart';
+import 'package:ataa/core/auth/auth_token_provider.dart';
+import 'package:ataa/core/auth/firebase_auth_token_provider.dart';
 import 'package:ataa/features/auth/data/data_source/auth_remote_data_source.dart';
 import 'package:ataa/features/auth/data/data_source/auth_remote_data_source_impl.dart';
 import 'package:ataa/features/auth/data/repo/auth_repo_impl.dart';
@@ -12,6 +15,7 @@ import 'package:ataa/features/beneficiary/domain/usecases/get_beneficiary_profil
 import 'package:ataa/features/beneficiary/domain/usecases/register_beneficiary.dart';
 import 'package:ataa/features/beneficiary/domain/usecases/save_beneficiary_case.dart';
 import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_cubit.dart';
+import 'package:ataa/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:ataa/features/upload/data/data_sources/upload_remote_data_source.dart';
 import 'package:ataa/features/upload/data/data_sources/upload_remote_data_source_impl.dart';
 import 'package:ataa/features/upload/data/repositories/upload_repository_impl.dart';
@@ -20,6 +24,7 @@ import 'package:ataa/features/upload/domain/usecases/confirm_upload.dart';
 import 'package:ataa/features/upload/domain/usecases/init_upload.dart';
 import 'package:ataa/features/upload/presentation/cubit/upload_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
@@ -27,9 +32,18 @@ final sl = GetIt.instance;
 
 void setupServiceLocator() {
   // Firebase Instances
+  // Firebase Instances
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
-  sl.registerLazySingleton<ApiService>(ApiService.new);
+
+  // Auth Token Provider
+  sl.registerLazySingleton<AuthTokenProvider>(FirebaseAuthTokenProvider.new);
+
+  sl.registerLazySingleton<ApiService>(() {
+    final dio = Dio();
+    dio.interceptors.add(AuthInterceptor(sl<AuthTokenProvider>()));
+    return ApiService(dio: dio);
+  });
 
   // Data Sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -47,7 +61,6 @@ void setupServiceLocator() {
   sl.registerLazySingleton<UploadRemoteDataSource>(
     () => UploadRemoteDataSourceImpl(
       apiService: sl<ApiService>(),
-      authRepo: sl<AuthRepo>(),
     ),
   );
 
@@ -82,4 +95,5 @@ void setupServiceLocator() {
       sl<UploadRepository>(),
     ),
   );
+  sl.registerFactory(() => SplashCubit(sl<FirebaseAuth>()));
 }
