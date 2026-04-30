@@ -9,6 +9,7 @@ import '../../features/beneficiary/presentation/views/beneficiary_case_create_vi
 import '../../features/beneficiary/presentation/views/beneficiary_case_details_view.dart';
 import '../../features/beneficiary/presentation/views/beneficiary_dashboard_view.dart';
 import '../../features/beneficiary/presentation/views/beneficiary_documents_view.dart';
+import '../../features/beneficiary/presentation/views/beneficiary_edit_profile_view.dart';
 import '../../features/beneficiary/presentation/views/beneficiary_profile_view.dart';
 import '../../features/beneficiary/presentation/views/beneficiary_register_view.dart';
 import '../../features/onboarding/presentation/views/onboarding_view.dart';
@@ -28,6 +29,7 @@ class AppRouter {
   static const String beneficiaryProfileRoute = '/beneficiary/profile';
   static const String beneficiaryCaseCreateRoute = '/beneficiary/case/create';
   static const String beneficiaryDocumentsRoute = '/beneficiary/documents';
+  static const String beneficiaryEditProfileRoute = '/beneficiary/profile/edit';
 
   static final router = GoRouter(
     initialLocation: splashRoute,
@@ -111,6 +113,15 @@ class AppRouter {
         pageBuilder: (context, state) => _slidePage(
           state: state,
           child: const BeneficiaryAccessGate(child: BeneficiaryDocumentsView()),
+        ),
+      ),
+      GoRoute(
+        path: beneficiaryEditProfileRoute,
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: const BeneficiaryAccessGate(
+            child: BeneficiaryEditProfileView(),
+          ),
         ),
       ),
     ],

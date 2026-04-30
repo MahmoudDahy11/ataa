@@ -37,6 +37,18 @@ class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
+  static const titleMedium = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
+  static const bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    color: AppColors.textSecondary,
+  );
+
   static const labelLarge = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,

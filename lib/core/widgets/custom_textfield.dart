@@ -15,6 +15,9 @@ class CustomTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool readOnly;
 
+  final String? prefixText;
+  final String? suffixText;
+
   const CustomTextField({
     super.key,
     required this.hintText,
@@ -27,6 +30,8 @@ class CustomTextField extends StatefulWidget {
     this.maxLines = 1,
     this.keyboardType,
     this.readOnly = false,
+    this.prefixText,
+    this.suffixText,
   });
 
   @override
@@ -58,6 +63,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           initialValue: widget.controller == null ? widget.initialValue : null,
           obscureText: widget.isPassword ? isObscured : false,
           validator: widget.validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: widget.onChanged,
           maxLines: widget.maxLines,
           keyboardType: widget.keyboardType,
@@ -71,6 +77,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
             prefixIcon: widget.prefixIcon != null
                 ? Icon(widget.prefixIcon, color: AppColors.primary)
                 : null,
+            prefixText: widget.prefixText,
+            prefixStyle: AppTextStyles.bodyLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+            suffixText: widget.suffixText,
+            suffixStyle: AppTextStyles.bodyLarge.copyWith(
+              color: AppColors.textPrimary,
+            ),
             suffixIcon: widget.isPassword
                 ? _buildPasswordIcon(isObscured)
                 : null,

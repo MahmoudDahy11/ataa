@@ -93,7 +93,6 @@ class ServerFailure extends CustomFailure {
         );
 
       case DioExceptionType.unknown:
-      default:
         return ServerFailure(
           errMessage: '[$requestStage] Unexpected error occurred',
         );

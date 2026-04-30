@@ -59,9 +59,7 @@ void setupServiceLocator() {
     ),
   );
   sl.registerLazySingleton<UploadRemoteDataSource>(
-    () => UploadRemoteDataSourceImpl(
-      apiService: sl<ApiService>(),
-    ),
+    () => UploadRemoteDataSourceImpl(apiService: sl<ApiService>()),
   );
 
   // Repositories
@@ -95,5 +93,5 @@ void setupServiceLocator() {
       sl<UploadRepository>(),
     ),
   );
-  sl.registerFactory(() => SplashCubit(sl<FirebaseAuth>()));
+  sl.registerFactory(() => SplashCubit(sl<FirebaseAuth>(), sl<AuthRepo>()));
 }
