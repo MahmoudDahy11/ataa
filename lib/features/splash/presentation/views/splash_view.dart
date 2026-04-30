@@ -39,6 +39,9 @@ class SplashViewBody extends StatelessWidget {
         } else if (state is SplashNavigateToProfile) {
           context.go(AppRouter.beneficiaryProfileRoute);
           showSnakBar(context, 'Redirecting to your profile...');
+        } else if (state is SplashNavigateToRegister) {
+          context.go(AppRouter.beneficiaryRegisterRoute);
+          showSnakBar(context, 'برجاء إكمال بيانات التسجيل...');
         }
       },
       child: const Scaffold(

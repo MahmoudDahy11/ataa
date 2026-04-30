@@ -1,11 +1,14 @@
 import 'package:ataa/core/constants/app_strings.dart';
 import 'package:ataa/core/di/service_locator.dart';
+import 'package:ataa/core/error/failure.dart';
 import 'package:ataa/core/router/app_router.dart';
 import 'package:ataa/core/theme/app_colors.dart';
 import 'package:ataa/core/widgets/custom_gradient_button.dart';
 import 'package:ataa/features/auth/domain/repo/auth_repo.dart';
+import 'package:ataa/features/beneficiary/domain/entities/beneficiary_entity.dart';
 import 'package:ataa/features/beneficiary/domain/entities/beneficiary_enums.dart';
 import 'package:ataa/features/beneficiary/domain/repo/beneficiary_repo.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,57 +28,76 @@ class BeneficiaryAccessGate extends StatelessWidget {
     final uid = authRepo.currentUserId;
     if (uid == null) {
       return _AccessMessage(
-        title: 'Sign in required',
-        message: 'Please sign in before opening beneficiary tools.',
-        cta: 'Go to login',
+        title: 'تسجيل الدخول مطلوب',
+        message: 'برجاء تسجيل الدخول أولاً للوصول إلى أدوات المحتاجين.',
+        cta: 'ذهاب لتسجيل الدخول',
         onPressed: () => context.go(AppRouter.phoneInputRoute),
       );
     }
     return FutureBuilder(
-      future: authRepo.getUserRole(uid: uid),
+      future: Future.wait([
+        authRepo.getUserRole(uid: uid),
+        sl<BeneficiaryRepo>().getProfile(),
+      ]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        final role = snapshot.data!.fold((_) => null, (value) => value);
+        final results = snapshot.data as List<dynamic>;
+        final role = results[0].fold((_) => null, (value) => value);
+        final profileResult =
+            results[1] as Either<CustomFailure, BeneficiaryEntity>;
+        final profile = profileResult.fold((_) => null, (value) => value);
+
+        // 1. Role Check
         if (role != AppStrings.beneficiaryRole) {
           return _AccessMessage(
-            title: 'Restricted route',
-            message: 'This route is only available for beneficiary accounts.',
-            cta: 'Choose role',
+            title: 'دخول مقيد',
+            message: 'هذا المسار مخصص فقط لحسابات المحتاجين.',
+            cta: 'اختار دورك',
             onPressed: () => context.go(AppRouter.roleSelectionRoute),
           );
         }
-        if (!requireApproved) {
-          return child;
+
+        // 2. Profile Existence Check
+        final isRegistering =
+            GoRouterState.of(context).matchedLocation ==
+            AppRouter.beneficiaryRegisterRoute;
+        final profileExists = profile != null && profile.fullName.isNotEmpty;
+
+        if (!profileExists && !isRegistering) {
+          return _AccessMessage(
+            title: 'إكمال التسجيل مطلوب',
+            message: 'برجاء إكمال بياناتك الشخصية أولاً للوصول إلى هذه الصفحة.',
+            cta: 'اذهب للتسجيل',
+            onPressed: () => context.go(AppRouter.beneficiaryRegisterRoute),
+          );
         }
-        return FutureBuilder(
-          future: sl<BeneficiaryRepo>().getProfile(),
-          builder: (context, profileSnapshot) {
-            if (!profileSnapshot.hasData) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            final profile = profileSnapshot.data!.fold(
-              (_) => null,
-              (value) => value,
-            );
-            if (profile?.status != BeneficiaryStatus.approved) {
-              return _AccessMessage(
-                title: 'Approval required',
-                message:
-                    'Your account must be approved before you can access this route.',
-                cta: 'Go to dashboard',
-                onPressed: () =>
-                    context.go(AppRouter.beneficiaryDashboardRoute),
-              );
-            }
-            return child;
-          },
-        );
+
+        if (profileExists && isRegistering) {
+          // Already registered, don't show registration form again
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.go(AppRouter.beneficiaryDashboardRoute);
+          });
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // 3. Approval Check (if required)
+        if (requireApproved && profile?.status != BeneficiaryStatus.approved) {
+          return _AccessMessage(
+            title: 'الموافقة مطلوبة',
+            message:
+                'يجب مراجعة حسابك والموافقة عليه قبل الوصول إلى هذا المسار.',
+            cta: 'اذهب للوحة التحكم',
+            onPressed: () => context.go(AppRouter.beneficiaryDashboardRoute),
+          );
+        }
+
+        return child;
       },
     );
   }

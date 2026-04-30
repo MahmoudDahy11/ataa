@@ -36,9 +36,14 @@ extension BeneficiaryCubitValidation on BeneficiaryCubit {
         if (draft.familySize < 1 || draft.familySize > 20) {
           return 'عدد أفراد الأسرة يجب أن يكون بين 1 و20';
         }
-        return IncomeStatusOption.all.contains(draft.incomeStatus)
-            ? null
-            : 'اختار حالة الدخل';
+        if (!IncomeStatusOption.all.contains(draft.incomeStatus)) {
+          return 'اختار حالة الدخل';
+        }
+        if (!draft.useSamePhoneForPayout &&
+            !RegExp(r'^01[0125][0-9]{8}$').hasMatch(draft.payoutAccount)) {
+          return 'رقم فودافون كاش البديل يجب أن يكون 11 رقمًا ويبدأ بـ 01';
+        }
+        return null;
       case 3:
         return HealthConditionOption.all.contains(draft.healthCondition)
             ? null

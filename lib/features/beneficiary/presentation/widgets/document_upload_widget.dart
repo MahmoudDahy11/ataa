@@ -41,8 +41,9 @@ class DocumentUploadWidget extends StatelessWidget {
         return DocumentUploadCard(
           label: label,
           helperText: helperText,
-          uploadedFileName:
-              (state is UploadSuccess) ? state.document.fileName : uploadedFileName,
+          uploadedFileName: (state is UploadSuccess)
+              ? state.document.fileName
+              : uploadedFileName,
           isUploaded: isUploaded || state is UploadSuccess,
           state: state,
           onPick: cubit.pickFile,

@@ -20,6 +20,7 @@ class RegistrationDraft {
   final bool hasLoans;
   final String payoutMethod;
   final String payoutAccount;
+  final bool useSamePhoneForPayout;
   final String bankName;
   final String accountNumber;
   final String accountHolderName;
@@ -43,6 +44,7 @@ class RegistrationDraft {
     this.hasLoans = false,
     this.payoutMethod = PayoutMethodOption.vodafoneCash,
     this.payoutAccount = '',
+    this.useSamePhoneForPayout = true,
     this.bankName = '',
     this.accountNumber = '',
     this.accountHolderName = '',
@@ -67,6 +69,7 @@ class RegistrationDraft {
     bool? hasLoans,
     String? payoutMethod,
     String? payoutAccount,
+    bool? useSamePhoneForPayout,
     String? bankName,
     String? accountNumber,
     String? accountHolderName,
@@ -90,6 +93,8 @@ class RegistrationDraft {
       hasLoans: hasLoans ?? this.hasLoans,
       payoutMethod: payoutMethod ?? this.payoutMethod,
       payoutAccount: payoutAccount ?? this.payoutAccount,
+      useSamePhoneForPayout:
+          useSamePhoneForPayout ?? this.useSamePhoneForPayout,
       bankName: bankName ?? this.bankName,
       accountNumber: accountNumber ?? this.accountNumber,
       accountHolderName: accountHolderName ?? this.accountHolderName,
@@ -99,10 +104,28 @@ class RegistrationDraft {
   }
 
   BeneficiaryEntity toEntity({required String id}) {
+    String formatPhone(String p) {
+      if (p.isEmpty) return '';
+      final digits = p.replaceAll(RegExp(r'\D'), '');
+      if (digits.length == 10) return '+20$digits';
+      if (digits.length == 11 && digits.startsWith('0')) {
+        return '+20${digits.substring(1)}';
+      }
+      if (digits.length == 12 && digits.startsWith('20')) {
+        return '+$digits';
+      }
+      return p.startsWith('+') ? p : '+$p';
+    }
+
+    final finalPhone = formatPhone(phone);
+    final finalPayoutAccount = useSamePhoneForPayout
+        ? finalPhone
+        : (payoutAccount.isEmpty ? null : formatPhone(payoutAccount));
+
     return BeneficiaryEntity(
       id: id,
       fullName: fullName,
-      phone: phone,
+      phone: finalPhone,
       nationalId: nationalId,
       dateOfBirth: dateOfBirth,
       address: address,
@@ -116,7 +139,7 @@ class RegistrationDraft {
       monthlyExpenses: monthlyExpenses,
       hasLoans: hasLoans,
       payoutMethod: payoutMethod,
-      payoutAccount: payoutAccount.isEmpty ? null : payoutAccount,
+      payoutAccount: finalPayoutAccount,
       bankName: bankName.isEmpty ? null : bankName,
       accountNumber: accountNumber.isEmpty ? null : accountNumber,
       accountHolderName: accountHolderName.isEmpty ? null : accountHolderName,

@@ -29,8 +29,9 @@ class DocumentUploadCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final busy = state is UploadLoading || state is UploadInProgress;
-    final progress =
-        state is UploadInProgress ? (state as UploadInProgress).progress : null;
+    final progress = state is UploadInProgress
+        ? (state as UploadInProgress).progress
+        : null;
     final fileName = state.file?.name ?? uploadedFileName ?? '';
 
     return Container(
@@ -73,9 +74,7 @@ class DocumentUploadCard extends StatelessWidget {
           ],
           if (busy) ...[
             const SizedBox(height: 14),
-            LinearProgressIndicator(
-              value: progress == 0 ? null : progress,
-            ),
+            LinearProgressIndicator(value: progress == 0 ? null : progress),
           ],
           const SizedBox(height: 18),
           Row(

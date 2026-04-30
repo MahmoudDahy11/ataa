@@ -63,8 +63,11 @@ class UploadCubit extends Cubit<UploadState> {
     required UploadFile file,
     required String fileKey,
   }) async {
-    final result =
-        await _confirmUpload(fileKey: fileKey, type: type, file: file);
+    final result = await _confirmUpload(
+      fileKey: fileKey,
+      type: type,
+      file: file,
+    );
     result.fold(
       (f) => _fail(f.errMessage, type: type, fileKey: fileKey, canRetry: true),
       (doc) => emit(

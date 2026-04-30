@@ -143,22 +143,43 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   }
 
   Future<void> updateProfile() async {
-    final profile = state.profile;
-    if (profile == null) {
-      return;
-    }
-    emit(state.copyWith(isLoading: true, clearError: true, clearSuccess: true));
-    final result = await _repo.updateProfile(beneficiary: profile);
-    result.fold(_emitFailure, (updated) {
-      emit(
+    final draft = state.registrationDraft;
+    final currentProfile = state.profile;
+    if (currentProfile == null) return;
+
+    emit(
+      state.copyWith(
+        isSubmittingRegistration: true,
+        clearError: true,
+        clearSuccess: true,
+      ),
+    );
+
+    // Create updated entity from draft, preserving the original status and other immutable fields
+    final updatedEntity = draft
+        .toEntity(id: currentProfile.id)
+        .copyWith(
+          status: currentProfile.status,
+          documents: currentProfile.documents,
+          createdAt: currentProfile.createdAt,
+        );
+
+    final result = await _repo.updateProfile(beneficiary: updatedEntity);
+    result.fold(
+      (failure) => emit(
         state.copyWith(
-          isLoading: false,
-          profile: updated,
-          uploadedDocumentsByType: _documentsByType(updated.documents),
-          successMessage: 'Profile updated successfully.',
+          isSubmittingRegistration: false,
+          errorMessage: failure.errMessage,
         ),
-      );
-    });
+      ),
+      (updated) => emit(
+        state.copyWith(
+          isSubmittingRegistration: false,
+          profile: updated,
+          successMessage: 'تم تحديث البيانات بنجاح',
+        ),
+      ),
+    );
   }
 
   Future<void> loadDashboard({Object? startAfter}) async {
