@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -18,84 +21,182 @@ class CustomFailure {
 
 class ServerFailure extends CustomFailure {
   ServerFailure({required super.errMessage});
-  factory ServerFailure.fromDioException(DioException dioException) {
+
+  factory ServerFailure.fromDioException(
+    DioException dioException, {
+    String? requestStage,
+  }) {
+    log('---------------------------------------------------');
+    log('CURRENT UID: ${FirebaseAuth.instance.currentUser?.uid}');
+    log('RAW RESPONSE DATA: ${dioException.response?.data}');
+    log('STATUS CODE: ${dioException.response?.statusCode}');
+    log('REQUEST URL: ${dioException.requestOptions.baseUrl}');
+    log('FULL PATH: ${dioException.requestOptions.path}');
+    log('---------------------------------------------------');
+
+    final url = dioException.requestOptions.uri.toString();
+    final method = dioException.requestOptions.method;
+
+    final isStorjRequest = method == 'PUT' || url.contains('storj');
+
     switch (dioException.type) {
       case DioExceptionType.connectionTimeout:
-        return ServerFailure(errMessage: 'Connection timeout with API');
+        return ServerFailure(
+          errMessage: '[$requestStage] Connection timeout with API',
+        );
+
       case DioExceptionType.sendTimeout:
-        return ServerFailure(errMessage: 'Failed to send request to API');
+        return ServerFailure(
+          errMessage: '[$requestStage] Failed to send request to API',
+        );
+
       case DioExceptionType.receiveTimeout:
-        return ServerFailure(errMessage: 'Failed to receive response from API');
+        return ServerFailure(
+          errMessage: '[$requestStage] Failed to receive response from API',
+        );
+
       case DioExceptionType.badCertificate:
-        return ServerFailure(errMessage: 'Bad certificate received');
+        return ServerFailure(
+          errMessage: '[$requestStage] Bad certificate received',
+        );
+
+      case DioExceptionType.cancel:
+        return ServerFailure(
+          errMessage: '[$requestStage] Request was cancelled',
+        );
+
+      case DioExceptionType.connectionError:
+        return ServerFailure(
+          errMessage: '[$requestStage] Internet connection failed',
+        );
+
       case DioExceptionType.badResponse:
         final statusCode = dioException.response?.statusCode;
         final data = dioException.response?.data;
-        if (statusCode != null && data != null) {
-          return ServerFailure.fromResponse(statusCode, data);
+
+        /// 🔴 مهم: مفيش response أصلاً
+        if (data == null) {
+          return isStorjRequest
+              ? ServerFailure(
+                  errMessage:
+                      '[$requestStage] Storage upload failed (no response)',
+                )
+              : ServerFailure(
+                  errMessage: '[$requestStage] Server returned empty response',
+                );
         }
-        return ServerFailure(
-          errMessage: 'Invalid response received. Please try again.',
+
+        return ServerFailure.fromResponse(
+          statusCode ?? 0,
+          data,
+          requestStage: requestStage,
         );
-      case DioExceptionType.cancel:
-        return ServerFailure(
-          errMessage: 'Request was cancelled. Please try again.',
-        );
-      case DioExceptionType.connectionError:
-        return ServerFailure(
-          errMessage: 'Internet connection failed. Please try again.',
-        );
+
       case DioExceptionType.unknown:
-        return ServerFailure(errMessage: 'Unexpected error. Please try again.');
-      // ignore: unreachable_switch_default
       default:
         return ServerFailure(
-          errMessage: 'An error occurred. Please try again.',
+          errMessage: '[$requestStage] Unexpected error occurred',
         );
-    }
-  }
-  factory ServerFailure.fromResponse(
-    int statusCode,
-    Map<String, dynamic> responseData,
-  ) {
-    if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
-      final errorMessage = _safeGet(
-        responseData,
-        'error.message',
-        'Authentication failed. Please check your credentials.',
-      );
-      return ServerFailure(errMessage: errorMessage);
-    } else if (statusCode == 404) {
-      return ServerFailure(
-        errMessage: 'The requested resource was not found. Please try later.',
-      );
-    } else if (statusCode == 500) {
-      return ServerFailure(
-        errMessage: 'Server error occurred. Please try later.',
-      );
-    } else {
-      return ServerFailure(errMessage: 'Unexpected error. Please try again.');
     }
   }
 
-  static String _safeGet(
-    Map<String, dynamic> data,
-    String path,
-    String defaultValue,
-  ) {
-    try {
-      final parts = path.split('.');
-      dynamic result = data;
-      for (var part in parts) {
-        if (result is Map<String, dynamic>) {
-          result = result[part];
-        } else {
-          return defaultValue;
+  factory ServerFailure.fromResponse(
+    int statusCode,
+    dynamic responseData, {
+    String? requestStage,
+  }) {
+    final data = _asMap(responseData);
+    final code = _extractCode(data);
+
+    /// 🔴 مهم: مفيش error code أصلاً
+    if (code == null) {
+      return ServerFailure(
+        errMessage:
+            '[$requestStage] Unexpected server response (no error code)',
+      );
+    }
+
+    final message = _messageFromCode(code);
+
+    if (statusCode == 500) {
+      return ServerFailure(errMessage: '[$requestStage] Server error occurred');
+    }
+
+    return ServerFailure(errMessage: '[$requestStage] $message');
+  }
+
+  /// استخراج الكود بشكل قوي (كل الحالات)
+  static String? _extractCode(Map<String, dynamic> data) {
+    final error = data['error'];
+
+    if (error is String) return error;
+
+    if (error is Map) {
+      final map = Map<String, dynamic>.from(error);
+      return map['code']?.toString();
+    }
+
+    if (data['code'] is String) {
+      return data['code'] as String;
+    }
+
+    return null;
+  }
+
+  /// تحويل أي response بشكل آمن
+  static Map<String, dynamic> _asMap(dynamic responseData) {
+    if (responseData is Map<String, dynamic>) {
+      return responseData;
+    }
+
+    if (responseData is Map) {
+      return Map<String, dynamic>.from(responseData);
+    }
+
+    if (responseData is String) {
+      try {
+        final decoded = jsonDecode(responseData);
+
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
         }
+
+        if (decoded is Map) {
+          return Map<String, dynamic>.from(decoded);
+        }
+
+        return {'error': decoded.toString()};
+      } catch (_) {
+        /// 🔴 مش JSON (HTML / XML / plain text)
+        return {'error': responseData};
       }
-      return result?.toString() ?? defaultValue;
-    } catch (e) {
-      return defaultValue;
+    }
+
+    return {};
+  }
+
+  static String _messageFromCode(String? code) {
+    switch (code) {
+      case 'INVALID_FILE_TYPE':
+        return 'نوع الملف غير مدعوم.';
+
+      case 'FILE_TOO_LARGE':
+        return 'حجم الملف أكبر من الحد المسموح.';
+
+      case 'UNAUTHORIZED':
+        return 'يجب تسجيل الدخول قبل رفع الملفات.';
+
+      case 'UPLOAD_SESSION_NOT_FOUND':
+        return 'جلسة الرفع غير موجودة.';
+
+      case 'UPLOAD_SESSION_EXPIRED':
+        return 'انتهت صلاحية جلسة الرفع. حاول مرة أخرى.';
+
+      case 'UPLOAD_ALREADY_CONFIRMED':
+        return 'تم تأكيد هذا الملف بالفعل.';
+
+      default:
+        return 'خطأ غير معروف من السيرفر.';
     }
   }
 }

@@ -3,9 +3,11 @@ import 'package:dio/dio.dart';
 class ApiService {
   final Dio _dio;
 
-  ApiService({Dio? dio}) : _dio = dio ?? Dio();
+  ApiService({Dio? dio}) : _dio = dio ?? Dio() {
+    _dio.options.headers['ngrok-skip-browser-warning'] = 'true';
+  }
 
-  Future<Response> post({
+  Future<Response<dynamic>> post({
     required String url,
     required String contentType,
     required Map<String, dynamic> body,
@@ -23,7 +25,7 @@ class ApiService {
     return response;
   }
 
-  Future<Response> get({
+  Future<Response<dynamic>> get({
     required String url,
     required String token,
     Map<String, dynamic>? queryParameters,
@@ -36,13 +38,27 @@ class ApiService {
     return response;
   }
 
-  /*
-  * This method is used to upload files as bytes to the server.
-  * It takes the URL, the file bytes, content type, optional headers, and a callback for tracking upload progress.
-  * The content type should be set according to the file type being uploaded (e.g., 'image/jpeg' for JPEG images).
-  * The onSendProgress callback provides the number of bytes sent and the total bytes to be sent, allowing you to implement a progress indicator in the UI.
-  */
-  Future<Response> putBytes({
+  Future<Response<dynamic>> postJson({
+    required String url,
+    required Map<String, dynamic> body,
+    String? token,
+    Map<String, dynamic>? headers,
+  }) {
+    return _dio.post(
+      url,
+      data: body,
+      options: Options(
+        contentType: Headers.jsonContentType,
+        headers: {
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
+          ...?headers,
+        },
+      ),
+    );
+  }
+
+  Future<Response<dynamic>> putBytes({
     required String url,
     required List<int> bytes,
     required String contentType,
