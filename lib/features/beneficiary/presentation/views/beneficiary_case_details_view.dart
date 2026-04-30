@@ -43,7 +43,7 @@ class _BeneficiaryCaseDetailsBody extends StatelessWidget {
               Row(
                 children: [
                   Expanded(child: Text(item.title)),
-                  StatusBadge(label: item.status),
+                  StatusBadge(status: item.status),
                 ],
               ),
               const SizedBox(height: 12),

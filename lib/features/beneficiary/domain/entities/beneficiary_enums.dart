@@ -4,6 +4,32 @@ class BeneficiaryStatus {
   static const pendingReview = 'pending_review';
   static const approved = 'approved';
   static const rejected = 'rejected';
+  static const actionRequired = 'action_required';
+  static const verified = 'verified';
+
+  static const all = [
+    pendingReview,
+    approved,
+    rejected,
+    actionRequired,
+    verified,
+  ];
+
+  static const labels = {
+    pendingReview: 'قيد المراجعة',
+    approved: 'مقبول',
+    rejected: 'مرفوض',
+    actionRequired: 'يحتاج إجراء',
+    verified: 'مفعل',
+  };
+
+  static const explanations = {
+    pendingReview: 'طلبك حالياً تحت المراجعة من قبل فريقنا.',
+    approved: 'تهانينا! تم قبول طلبك بنجاح.',
+    rejected: 'للأسف لم يتم قبول طلبك، يرجى التواصل مع الدعم.',
+    actionRequired: 'هناك بيانات ناقصة أو مستندات تحتاج لتحديث.',
+    verified: 'تم توثيق حسابك بالكامل.',
+  };
 }
 
 class CaseLifecycle {

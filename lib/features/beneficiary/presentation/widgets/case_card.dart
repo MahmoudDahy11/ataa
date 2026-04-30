@@ -30,7 +30,7 @@ class CaseCard extends StatelessWidget {
                   Expanded(
                     child: Text(item.title, style: AppTextStyles.titleLarge),
                   ),
-                  StatusBadge(label: item.status),
+                  StatusBadge(status: item.status),
                 ],
               ),
               const SizedBox(height: 8),

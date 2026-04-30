@@ -71,7 +71,7 @@ class _BeneficiaryDashboardBody extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               children: [
                 if (profile != null) ...[
-                  StatusBadge(label: profile.status),
+                  StatusBadge(status: profile.status),
                   const SizedBox(height: 12),
                   Text(
                     profile.fullName,

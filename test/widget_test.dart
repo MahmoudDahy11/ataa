@@ -8,9 +8,9 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(body: StatusBadge(label: 'pending_review')),
+        home: Scaffold(body: StatusBadge(status: 'pending_review')),
       ),
     );
-    expect(find.text('pending review'), findsOneWidget);
+    expect(find.text('قيد المراجعة'), findsOneWidget);
   });
 }
