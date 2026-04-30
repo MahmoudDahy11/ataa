@@ -30,6 +30,9 @@ abstract class AuthRepo {
   /// Signs the current user out.
   Future<void> signOut();
 
+  /// Returns a fresh Firebase ID token for backend requests.
+  Future<String?> getIdToken();
+
   /// Returns the current user's UID, or null if not signed in.
   String? get currentUserId;
 

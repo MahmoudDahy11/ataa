@@ -55,60 +55,62 @@ class _RoleSelectionViewBodyState extends State<RoleSelectionViewBody> {
             ),
             automaticallyImplyLeading: false, // Don't let user go back to OTP
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'How would you like to use Ataa?',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'How would you like to use Ataa?',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Choose your primary role. This cannot be changed later for this phone number.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Choose your primary role. This cannot be changed later for this phone number.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                _buildRoleCard(
-                  title: 'Donor',
-                  description:
-                      'I want to browse cases and donate to those in need.',
-                  icon: Icons.volunteer_activism_rounded,
-                  value: 'Donor',
-                ),
-                const SizedBox(height: 16),
-                _buildRoleCard(
-                  title: 'Beneficiary',
-                  description:
-                      'I am seeking support and want to register my case.',
-                  icon: Icons.handshake_rounded,
-                  value: 'Beneficiary',
-                ),
-                const Spacer(),
-                CustomGradientButton(
-                  text: 'Complete Setup',
-                  isLoading: state is AuthLoading,
-                  onPressed: () {
-                    if (_selectedRole == null) {
-                      showSnakBar(
-                        context,
-                        AppStrings.selectRoleMsg,
-                        isError: true,
-                      );
-                      return;
-                    }
-                    context.read<AuthCubit>().selectRole(_selectedRole!);
-                  },
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  _buildRoleCard(
+                    title: 'Donor',
+                    description:
+                        'I want to browse cases and donate to those in need.',
+                    icon: Icons.volunteer_activism_rounded,
+                    value: 'Donor',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildRoleCard(
+                    title: 'Beneficiary',
+                    description:
+                        'I am seeking support and want to register my case.',
+                    icon: Icons.handshake_rounded,
+                    value: 'Beneficiary',
+                  ),
+                  const SizedBox(height: 48),
+                  CustomGradientButton(
+                    text: 'Complete Setup',
+                    isLoading: state is AuthLoading,
+                    onPressed: () {
+                      if (_selectedRole == null) {
+                        showSnakBar(
+                          context,
+                          AppStrings.selectRoleMsg,
+                          isError: true,
+                        );
+                        return;
+                      }
+                      context.read<AuthCubit>().selectRole(_selectedRole!);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );

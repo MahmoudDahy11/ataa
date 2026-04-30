@@ -70,12 +70,12 @@ class RequiredDocumentType {
   static const medicalReport = 'medical_report';
   static const debtProof = 'debt_proof';
 
-  static const all = <String>[idCard, medicalReport, debtProof];
+  static const all = <String>[idCard];
 
   static const labels = <String, String>{
-    idCard: 'ID Card',
-    medicalReport: 'Medical Report',
-    debtProof: 'Debt Proof',
+    idCard: 'بطاقة الرقم القومي',
+    medicalReport: 'تقرير طبي',
+    debtProof: 'إثبات مديونية',
   };
 }
 

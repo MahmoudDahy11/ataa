@@ -5,6 +5,7 @@ import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_cubit.d
 import 'package:ataa/features/beneficiary/presentation/cubit/beneficiary_state.dart';
 import 'package:ataa/features/beneficiary/presentation/widgets/beneficiary_display_utils.dart';
 import 'package:ataa/features/beneficiary/presentation/widgets/document_upload_widget.dart';
+import 'package:ataa/features/upload/presentation/cubit/upload_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,26 +48,18 @@ class _BeneficiaryDocumentsBody extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      DocumentUploadWidget(
-                        label: documentLabel(type),
-                        helperText: item == null
-                            ? 'Required upload'
-                            : item.fileName,
-                        isUploaded: item != null,
-                        isUploading:
-                            state.isUploading && state.activeUploadType == type,
-                        progress: state.activeUploadType == type
-                            ? state.uploadProgress
-                            : 0,
-                        onFileSelected: (file) {
-                          cubit.startUpload(
-                            fileName: file.fileName,
-                            mimeType: file.mimeType,
-                            bytes: file.bytes,
-                            scope: 'beneficiary_document',
-                            documentType: type,
-                          );
-                        },
+                      BlocProvider<UploadCubit>(
+                        create: (_) => sl<UploadCubit>(),
+                        child: DocumentUploadWidget(
+                          documentType: type,
+                          label: documentLabel(type),
+                          helperText: item == null
+                              ? 'Required upload'
+                              : item.fileName,
+                          uploadedFileName: item?.fileName,
+                          isUploaded: item != null,
+                          onUploaded: cubit.saveUploadedDocument,
+                        ),
                       ),
                       if (item != null)
                         ListTile(

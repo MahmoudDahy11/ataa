@@ -1,10 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:ataa/core/error/failure.dart';
 import 'package:ataa/features/beneficiary/domain/entities/beneficiary_entity.dart';
 import 'package:ataa/features/beneficiary/domain/entities/case_entity.dart';
-import 'package:ataa/features/beneficiary/domain/entities/document_entity.dart';
-import 'package:ataa/features/beneficiary/domain/entities/upload_entities.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 
@@ -36,24 +32,5 @@ abstract class BeneficiaryRepo {
 
   Future<Either<CustomFailure, CaseEntity>> submitCaseForReview({
     required String caseId,
-  });
-
-  Future<Either<CustomFailure, UploadSession>> initUpload({
-    required UploadRequest request,
-  });
-
-  Future<Either<CustomFailure, DocumentEntity>> confirmUpload({
-    required String uploadId,
-    required String ownerId,
-    required String type,
-  });
-
-  Future<Either<CustomFailure, DocumentEntity>> retryUpload({
-    required String uploadId,
-    required String ownerId,
-    required String type,
-    required Uint8List bytes,
-    required String mimeType,
-    void Function(double progress)? onProgress,
   });
 }

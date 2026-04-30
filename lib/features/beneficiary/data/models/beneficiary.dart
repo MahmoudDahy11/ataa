@@ -35,6 +35,38 @@ class BeneficiaryModel extends BeneficiaryEntity {
     required super.updatedAt,
   });
 
+  factory BeneficiaryModel.fromEntity(BeneficiaryEntity entity) {
+    return BeneficiaryModel(
+      id: entity.id,
+      fullName: entity.fullName,
+      phone: entity.phone,
+      nationalId: entity.nationalId,
+      dateOfBirth: entity.dateOfBirth,
+      address: entity.address,
+      city: entity.city,
+      governorate: entity.governorate,
+      familySize: entity.familySize,
+      incomeStatus: entity.incomeStatus,
+      healthCondition: entity.healthCondition,
+      healthDetails: entity.healthDetails,
+      debtInfo: entity.debtInfo,
+      monthlyExpenses: entity.monthlyExpenses,
+      hasLoans: entity.hasLoans,
+      payoutMethod: entity.payoutMethod,
+      payoutAccount: entity.payoutAccount,
+      bankName: entity.bankName,
+      accountNumber: entity.accountNumber,
+      accountHolderName: entity.accountHolderName,
+      documentIds: entity.documentIds,
+      status: entity.status,
+      isDeleted: entity.isDeleted,
+      schemaVersion: entity.schemaVersion,
+      documents: entity.documents,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
   factory BeneficiaryModel.fromJson(
     Map<String, dynamic> json, {
     String id = '',

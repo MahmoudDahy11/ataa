@@ -109,6 +109,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<String?> getIdToken() async => _auth.currentUser?.getIdToken(true);
+
+  @override
   String? get currentUserId => _auth.currentUser?.uid;
 
   @override

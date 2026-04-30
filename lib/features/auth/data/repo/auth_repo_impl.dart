@@ -84,6 +84,9 @@ class AuthRepoImpl implements AuthRepo {
   }
 
   @override
+  Future<String?> getIdToken() => _dataSource.getIdToken();
+
+  @override
   String? get currentUserId => _dataSource.currentUserId;
 
   @override

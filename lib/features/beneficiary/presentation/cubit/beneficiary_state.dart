@@ -8,7 +8,6 @@ class BeneficiaryState {
   final bool isLoading;
   final bool isSubmittingRegistration;
   final bool isSavingCase;
-  final bool isUploading;
   final int currentStep;
   final String? errorMessage;
   final String? successMessage;
@@ -21,9 +20,6 @@ class BeneficiaryState {
   final Map<String, DocumentEntity> uploadedDocumentsByType;
   final bool hasMoreCases;
   final Object? lastCaseCursor;
-  final double uploadProgress;
-  final String? activeUploadId;
-  final String? activeUploadType;
   final int totalCases;
   final int activeCases;
   final int completedCases;
@@ -32,7 +28,6 @@ class BeneficiaryState {
     this.isLoading = false,
     this.isSubmittingRegistration = false,
     this.isSavingCase = false,
-    this.isUploading = false,
     this.currentStep = 0,
     this.errorMessage,
     this.successMessage,
@@ -45,9 +40,6 @@ class BeneficiaryState {
     this.uploadedDocumentsByType = const {},
     this.hasMoreCases = true,
     this.lastCaseCursor,
-    this.uploadProgress = 0,
-    this.activeUploadId,
-    this.activeUploadType,
     this.totalCases = 0,
     this.activeCases = 0,
     this.completedCases = 0,
@@ -57,7 +49,6 @@ class BeneficiaryState {
     bool? isLoading,
     bool? isSubmittingRegistration,
     bool? isSavingCase,
-    bool? isUploading,
     int? currentStep,
     String? errorMessage,
     String? successMessage,
@@ -70,9 +61,6 @@ class BeneficiaryState {
     Map<String, DocumentEntity>? uploadedDocumentsByType,
     bool? hasMoreCases,
     Object? lastCaseCursor,
-    double? uploadProgress,
-    String? activeUploadId,
-    String? activeUploadType,
     int? totalCases,
     int? activeCases,
     int? completedCases,
@@ -84,7 +72,6 @@ class BeneficiaryState {
       isSubmittingRegistration:
           isSubmittingRegistration ?? this.isSubmittingRegistration,
       isSavingCase: isSavingCase ?? this.isSavingCase,
-      isUploading: isUploading ?? this.isUploading,
       currentStep: currentStep ?? this.currentStep,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       successMessage: clearSuccess
@@ -100,9 +87,6 @@ class BeneficiaryState {
           uploadedDocumentsByType ?? this.uploadedDocumentsByType,
       hasMoreCases: hasMoreCases ?? this.hasMoreCases,
       lastCaseCursor: lastCaseCursor ?? this.lastCaseCursor,
-      uploadProgress: uploadProgress ?? this.uploadProgress,
-      activeUploadId: activeUploadId ?? this.activeUploadId,
-      activeUploadType: activeUploadType ?? this.activeUploadType,
       totalCases: totalCases ?? this.totalCases,
       activeCases: activeCases ?? this.activeCases,
       completedCases: completedCases ?? this.completedCases,

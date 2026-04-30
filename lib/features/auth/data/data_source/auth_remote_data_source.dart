@@ -24,6 +24,9 @@ abstract class AuthRemoteDataSource {
   /// Signs out the current user.
   Future<void> signOut();
 
+  /// Returns a fresh Firebase ID token for backend requests.
+  Future<String?> getIdToken();
+
   /// Returns the current user's UID, or null.
   String? get currentUserId;
 

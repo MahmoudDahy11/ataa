@@ -1,40 +1,73 @@
 # Storj Upload Setup
 
-The Flutter app calls the Firebase Functions upload API, receives a presigned
-PUT URL, and uploads bytes directly to Storj.
+The app now uses a backend-owned upload flow:
 
-## Firebase Functions configuration
+1. Flutter calls `POST /upload/init`
+2. Backend validates the file and returns `{ url, fileKey }`
+3. Flutter uploads bytes to Storj with `PUT`
+4. Flutter calls `POST /upload/confirm`
+5. Backend saves metadata in Firestore and marks the session used
 
-Set the Storj values on the backend only. Do not put these secrets in Flutter.
+## Backend environment
 
-```sh
-firebase functions:secrets:set STORJ_ACCESS_KEY
-firebase functions:secrets:set STORJ_SECRET_KEY
-firebase deploy --only functions
-```
-
-After deploy, point Flutter at the Functions base URL:
+Keep all Storj credentials on the backend only.
 
 ```env
-UPLOAD_BASE_URL=https://us-central1-ebra-app.cloudfunctions.net/uploadApi
+STORJ_ACCESS_KEY=
+STORJ_SECRET_KEY=
+STORJ_ENDPOINT=https://gateway.storjshare.io
+STORJ_BUCKET=
+MAX_FILE_SIZE=5242880
+PORT=3000
 ```
 
-The `uploadApi/init-upload` route returns both `signedUrl` and `uploadUrl`.
-The signed URL is path-style and starts with:
+The backend also needs Firebase Admin credentials available through the usual
+`GOOGLE_APPLICATION_CREDENTIALS` flow or your deployment platform's secret
+management.
 
-```text
-https://gateway.storjshare.io/ataa/
+## Flutter environment
+
+Flutter only needs the backend base URL and the client-side size cap.
+
+```env
+UPLOAD_BASE_URL=https://your-upload-service.example.com
+UPLOAD_MAX_BYTES=5242880
 ```
 
-## CORS
+## Session model
 
-The standard S3 CORS config is in `docs/storage/storj-cors.json`.
+Each upload is tracked in Firestore under `upload_sessions` with:
+
+```json
+{
+  "fileKey": "users/{userId}/documents/{timestamp}_{random}.{ext}",
+  "userId": "firebase uid",
+  "used": false,
+  "expiresAt": "timestamp",
+  "createdAt": "timestamp"
+}
+```
+
+Presigned URLs expire after 5 minutes. Upload sessions expire after 10 minutes.
+
+## Local run
 
 ```sh
-AWS_ACCESS_KEY_ID="YOUR_STORJ_ACCESS_KEY" AWS_SECRET_ACCESS_KEY="YOUR_STORJ_SECRET_KEY" aws s3api put-bucket-cors --endpoint-url https://gateway.storjshare.io --bucket ataa --cors-configuration file://docs/storage/storj-cors.json
+cd functions
+npm install
+npm run build
+npm run dev
 ```
 
-Storj's hosted Gateway-MT compatibility table currently marks `PutBucketCors`
-as unsupported. Native Flutter mobile uploads are not blocked by browser CORS.
-For Flutter Web, use a proxy upload endpoint or a gateway option that supports
-browser preflight/CORS.
+Point Flutter to the running service:
+
+```env
+UPLOAD_BASE_URL=http://localhost:3000
+```
+
+## Notes
+
+- No Storj secrets live in Flutter.
+- No client-side URL signing remains.
+- No Storj bucket CORS configuration is required for this mobile-first flow.
+- Files stay private and are referenced through Firestore metadata only.

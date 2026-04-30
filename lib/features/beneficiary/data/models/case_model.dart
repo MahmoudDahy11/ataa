@@ -20,6 +20,24 @@ class CaseModel extends CaseEntity {
     required super.updatedAt,
   });
 
+  factory CaseModel.fromEntity(CaseEntity entity) {
+    return CaseModel(
+      id: entity.id,
+      beneficiaryId: entity.beneficiaryId,
+      title: entity.title,
+      category: entity.category,
+      targetAmount: entity.targetAmount,
+      collectedAmount: entity.collectedAmount,
+      description: entity.description,
+      mediaKeys: entity.mediaKeys,
+      status: entity.status,
+      isDeleted: entity.isDeleted,
+      schemaVersion: entity.schemaVersion,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
   factory CaseModel.fromJson(Map<String, dynamic> json, {String id = ''}) {
     return CaseModel(
       id: id.isEmpty ? (json['id'] as String? ?? '') : id,
